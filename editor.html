@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estúdio de relatório · Laskasas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; }
+    body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #EEF0F4; color: #172033; -webkit-font-smoothing: antialiased; }
+    #root { height: 100vh; }
+
+    .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 18px; background: #172033; color: #fff; border-bottom: 1px solid #101828; }
+    .toolbar .brand { font-size: 10.5px; letter-spacing: .11em; text-transform: uppercase; color: #818CF8; font-weight: 700; }
+    .toolbar .title { font-family: 'Fraunces', serif; font-size: 16px; }
+    .toolbar .spacer { margin-left: auto; }
+    .save-tag { font-size: 11px; color: #818CF8; opacity: .85; }
+
+    .btn { border: none; cursor: pointer; padding: 8px 13px; border-radius: 8px; font-size: 12.3px; font-weight: 600; font-family: Inter, sans-serif; background: #2E3650; color: #fff; transition: background .15s ease; }
+    .btn:hover { background: #3B4560; }
+    .btn.primary { background: #4F46E5; color: #FFFFFF; }
+    .btn.primary:hover { background: #4338CA; }
+    .btn.ghost { background: transparent; border: 1px solid #ffffff33; }
+    .btn.ghost:hover { background: #ffffff14; }
+    .btn.danger { background: transparent; border: 1px solid #D92D20; color: #FDA29B; }
+    .btn.danger:hover { background: #D92D2022; }
+
+    .modeseg { display: inline-flex; background: #101828; border-radius: 999px; padding: 3px; gap: 2px; }
+    .modeseg button { border: none; cursor: pointer; padding: 6px 15px; border-radius: 999px; font-size: 12px; font-weight: 600; font-family: Inter, sans-serif; background: transparent; color: #98A2B3; }
+    .modeseg button.on { background: #4F46E5; color: #FFFFFF; }
+
+    .layout { display: flex; height: calc(100vh - 50px); }
+    .panel-edit { width: 46%; min-width: 380px; max-width: 660px; overflow-y: auto; background: #F7F8FA; border-right: 1px solid #E4E7EC; padding: 18px 20px 90px; }
+    .panel-preview { flex: 1; overflow-y: auto; background: #F7F8FA; }
+
+    .hint { background: rgba(79,70,229,.06); border: 1px solid rgba(79,70,229,.24); border-radius: 10px; padding: 11px 14px; font-size: 12px; line-height: 1.55; color: #3F3A7A; margin-bottom: 16px; }
+    .hint code { background: #00000010; padding: 1px 5px; border-radius: 4px; font-size: 11.5px; }
+
+    details.section { background: #fff; border: 1px solid #E4E7EC; border-radius: 12px; margin-bottom: 14px; overflow: hidden; }
+    details.section > summary { cursor: pointer; list-style: none; padding: 13px 16px; font-weight: 600; font-size: 13.5px; color: #172033; display: flex; align-items: center; gap: 8px; user-select: none; }
+    details.section > summary::-webkit-details-marker { display: none; }
+    details.section > summary .chev { transition: transform .15s ease; color: #4F46E5; font-size: 12px; }
+    details.section[open] > summary .chev { transform: rotate(90deg); }
+    details.section > summary .eyebrow { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #4F46E5; font-weight: 700; }
+    .section-body { padding: 4px 16px 16px; }
+
+    .field { margin-bottom: 12px; }
+    .field > label { display: block; font-size: 11px; font-weight: 600; color: #667085; margin-bottom: 4px; }
+    .field input[type=text], .field input[type=number], .field textarea, .field select { width: 100%; border: 1px solid #D0D5DD; border-radius: 7px; padding: 7px 9px; font-size: 12.5px; font-family: Inter, sans-serif; color: #172033; background: #FFFFFF; }
+    .field textarea { resize: vertical; min-height: 60px; line-height: 1.5; }
+    .field input:focus, .field textarea:focus, .field select:focus { outline: 2px solid #4F46E555; border-color: #4F46E5; }
+
+    .tbl-wrap { overflow-x: auto; margin-bottom: 8px; }
+    table.editor-tbl { border-collapse: collapse; width: 100%; font-size: 11.5px; }
+    table.editor-tbl th { text-align: left; font-weight: 600; color: #667085; padding: 4px 5px; font-size: 10px; text-transform: uppercase; letter-spacing: .03em; white-space: nowrap; }
+    table.editor-tbl td { padding: 2px 4px; vertical-align: top; }
+    table.editor-tbl input, table.editor-tbl select { border: 1px solid #D0D5DD; border-radius: 5px; padding: 5px 6px; font-size: 11.5px; font-family: Inter, sans-serif; background: #FFFFFF; color: #172033; }
+    table.editor-tbl input[type=text] { min-width: 90px; }
+    table.editor-tbl input[type=number] { width: 78px; }
+    .row-del { border: none; background: #D92D2015; color: #D92D20; cursor: pointer; border-radius: 5px; padding: 5px 8px; font-weight: 700; font-size: 12px; }
+    .row-del:hover { background: #D92D2030; }
+    .add-row { border: 1px dashed #4F46E5; background: #4F46E510; color: #4338CA; cursor: pointer; border-radius: 7px; padding: 6px 12px; font-size: 11.5px; font-weight: 600; }
+    .add-row:hover { background: #4F46E520; }
+
+    /* modo JSON */
+    .json-wrap { display: flex; flex-direction: column; height: 100%; }
+    .json-area { flex: 1; width: 100%; border: 1px solid #D0D5DD; border-radius: 10px; padding: 12px 13px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; line-height: 1.5; color: #172033; background: #FFFFFF; resize: none; min-height: 320px; }
+    .json-area:focus { outline: 2px solid #4F46E555; border-color: #4F46E5; }
+    .json-status { font-size: 11.5px; margin: 8px 2px 0; }
+    .json-status.ok { color: #12B76A; }
+    .json-status.err { color: #D92D20; }
+    details.prompt { margin-top: 12px; background: #fff; border: 1px solid #E4E7EC; border-radius: 10px; }
+    details.prompt > summary { cursor: pointer; padding: 11px 14px; font-weight: 600; font-size: 12.5px; color: #172033; }
+    details.prompt pre { margin: 0; padding: 12px 14px; border-top: 1px solid #E4E7EC; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11px; line-height: 1.5; white-space: pre-wrap; color: #475467; max-height: 340px; overflow: auto; }
+
+    #boot { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; background: #EEF0F4; color: #667085; font-size: 13.5px; z-index: 50; }
+    #boot .spin { width: 26px; height: 26px; border-radius: 50%; border: 2.5px solid #E4E7EC; border-top-color: #4F46E5; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #boot .err { max-width: 460px; text-align: center; line-height: 1.6; color: #D92D20; padding: 0 20px; }
+
+    @media (max-width: 860px) {
+      .layout { flex-direction: column; height: auto; }
+      .panel-edit { width: 100%; max-width: none; height: auto; }
+      .panel-preview { min-height: 70vh; }
+      .json-area { min-height: 300px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="boot"><div class="spin"></div><div id="boot-msg">A carregar o estúdio…</div></div>
+  <div id="root"></div>
+
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
+  <script crossorigin src="https://cdn.jsdelivr.net/npm/recharts@2.12.7/umd/Recharts.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.26.4/babel.min.js"></script>
+
+  <script>
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        var missing = [];
+        if (!window.React) missing.push('React');
+        if (!window.ReactDOM) missing.push('ReactDOM');
+        if (!window.Recharts) missing.push('Recharts');
+        if (!window.Babel) missing.push('Babel');
+        if (missing.length) { var b = document.getElementById('boot'); if (b) b.innerHTML = '<div class="err">Não foi possível carregar as dependências (' + missing.join(', ') + ').<br/>Verifique a ligação à internet e recarregue.</div>'; }
+      }, 500);
+    });
+  </script>
+
+  <!-- ============ MOTOR GENÉRICO DO RELATÓRIO (abas + blocos) ============ -->
+  <!-- Consome { meta, tabs:[{ label, blocks:[...] }] }. Usado na pré-visualização e embutido no index.html exportado. -->
+  <script type="text/plain" id="reportSrc">
+    const { useState } = React;
+    const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell, ReferenceLine } = Recharts;
+
+    const C = { bg: "#F7F8FA", surface: "#FFFFFF", navy: "#172033", navyLight: "#4F46E5", gold: "#4F46E5", goldLight: "#818CF8", slate: "#98A2B3", terracotta: "#D92D20", sage: "#12B76A", text: "#172033", muted: "#667085", border: "#E4E7EC" };
+    const PAL = { navy: C.navy, navyLight: C.navyLight, sage: C.sage, terracotta: C.terracotta, gold: C.gold, goldLight: C.goldLight, slate: C.slate };
+    const col = (k) => (k == null ? C.navy : (PAL[k] || (String(k).charAt(0) === "#" ? k : C.navy)));
+    const eur = (v) => new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(Number(v) || 0);
+    const num = (v) => (v == null || v === "" ? 0 : Number(v));
+
+    function fmt(v, kind) {
+      if (v == null || v === "") return "";
+      const n = Number(v);
+      switch (kind) {
+        case "percent": return v + "%";
+        case "percent1": return (isNaN(n) ? v : n.toFixed(1)) + "%";
+        case "eur": return eur(n);
+        case "eurM": return (n / 1e6).toFixed(1) + "M€";
+        case "eur2M": return (n / 1e6).toFixed(2) + " M€";
+        case "kEur": return (n / 1000).toFixed(0) + "k€";
+        case "eur3": return n.toFixed(3) + " €";
+        case "eur2": return n.toFixed(2) + "€";
+        case "eur1": return n.toFixed(1) + "€";
+        case "eurPlain": return v + "€";
+        case "number": return isNaN(n) ? v : n.toLocaleString("pt-PT");
+        default: return v;
+      }
+    }
+
+    function rich(str, boldColor) {
+      if (str == null) return null;
+      const c = boldColor || C.navy;
+      return String(str).split(/(\*\*[^*]+\*\*)/g).map((p, i) =>
+        (p.startsWith("**") && p.endsWith("**"))
+          ? React.createElement("b", { key: i, style: { color: c } }, p.slice(2, -2))
+          : p);
+    }
+
+    function Title({ eyebrow, title, subtitle, right }) {
+      if (!eyebrow && !title && !subtitle && !right) return null;
+      return (
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 18 }}>
+          <div style={{ flex: "1 1 340px" }}>
+            {eyebrow && <div style={{ fontSize: 10.5, letterSpacing: "0.08em", textTransform: "uppercase", color: C.gold, fontWeight: 700, marginBottom: 5 }}>{eyebrow}</div>}
+            {title && <div style={{ fontFamily: "'Fraunces', serif", fontSize: 20, color: C.navy }}>{title}</div>}
+            {subtitle && <div style={{ fontSize: 12.5, color: C.muted, marginTop: 5, maxWidth: 720, lineHeight: 1.55 }}>{subtitle}</div>}
+          </div>
+          {right}
+        </div>
+      );
+    }
+
+    function Note({ tone, children }) {
+      const t = { neutral: { bg: "rgba(23,32,51,.04)", bar: C.navyLight }, warn: { bg: "rgba(217,45,32,.06)", bar: C.terracotta }, good: { bg: "rgba(18,183,106,.08)", bar: C.sage }, gold: { bg: "rgba(79,70,229,.06)", bar: C.gold } }[tone || "neutral"] || { bg: "rgba(23,32,51,.04)", bar: C.navyLight };
+      return <div style={{ marginTop: 16, padding: "14px 17px", background: t.bg, borderLeft: `3px solid ${t.bar}`, borderRadius: 6, fontSize: 12.8, lineHeight: 1.65 }}>{children}</div>;
+    }
+
+    function Seg({ value, onChange, options }) {
+      return (
+        <div style={{ display: "inline-flex", background: "#EEF0F4", borderRadius: 999, padding: 3, gap: 2 }}>
+          {options.map((o) => (
+            <button key={o.value} onClick={() => onChange(o.value)}
+              style={{ border: "none", cursor: "pointer", padding: "6px 14px", borderRadius: 999, fontSize: 12, fontWeight: 600, fontFamily: "Inter, sans-serif", background: value === o.value ? C.navy : "transparent", color: value === o.value ? "#fff" : C.muted }}>
+              {o.label}
+            </button>
+          ))}
+        </div>
+      );
+    }
+
+    function KpisBlock({ items }) {
+      return (
+        <div style={{ display: "flex", gap: 13, flexWrap: "wrap" }}>
+          {(items || []).map((k, i) => (
+            <div key={i} style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 14, padding: "18px 20px", flex: "1 1 210px", minWidth: 190 }}>
+              <div style={{ fontSize: 10.5, letterSpacing: "0.06em", textTransform: "uppercase", color: C.muted, fontWeight: 700, marginBottom: 8 }}>{k.eyebrow}</div>
+              <div style={{ fontFamily: "'Fraunces', serif", fontSize: 27, color: col(k.accent), lineHeight: 1.1 }}>{k.value}</div>
+              {k.sub && <div style={{ fontSize: 12, color: C.muted, marginTop: 6, lineHeight: 1.45 }}>{k.sub}</div>}
+              {k.footnote && <div style={{ fontSize: 9.5, color: C.gold, marginTop: 6, fontWeight: 600 }}>{k.footnote}</div>}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    function Synthesis({ title, items }) {
+      return (
+        <div style={{ background: C.navy, borderRadius: 16, padding: "26px 30px", color: "#fff" }}>
+          {title && <div style={{ fontSize: 10.5, letterSpacing: "0.08em", textTransform: "uppercase", color: C.goldLight, fontWeight: 700, marginBottom: 14 }}>{title}</div>}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(270px, 1fr))", gap: 20, fontSize: 13.5, lineHeight: 1.6 }}>
+            {(items || []).map((s, i) => <div key={i}><b style={{ color: C.goldLight }}>{s.lead}</b> {s.text}</div>)}
+          </div>
+        </div>
+      );
+    }
+
+    function Callout({ title, text }) {
+      return (
+        <div style={{ background: C.navy, borderRadius: 16, padding: "24px 28px", color: "#fff" }}>
+          {title && <div style={{ fontSize: 10.5, letterSpacing: "0.08em", textTransform: "uppercase", color: C.goldLight, fontWeight: 700, marginBottom: 10 }}>{title}</div>}
+          <div style={{ fontSize: 14, lineHeight: 1.65, maxWidth: 860 }}>{text}</div>
+        </div>
+      );
+    }
+
+    function Banner({ tone, text }) {
+      const bar = col(tone === "warn" ? "terracotta" : tone === "good" ? "sage" : "gold");
+      return <div style={{ background: `${bar}17`, border: `1px solid ${bar}55`, borderRadius: 12, padding: "14px 18px", fontSize: 12.5, color: C.text, lineHeight: 1.6 }}>{rich(text)}</div>;
+    }
+
+    function FunnelBlock({ steps }) {
+      return (
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+          {(steps || []).map((s, i) => (
+            <div key={i} style={{ flex: "1 1 180px", minWidth: 160, background: col(s.color), borderRadius: 12, padding: "18px 18px", color: "#fff" }}>
+              <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.05em", opacity: 0.75, fontWeight: 700, marginBottom: 8 }}>{i + 1}. {s.label}</div>
+              <div style={{ fontFamily: "'Fraunces', serif", fontSize: 25, lineHeight: 1.05 }}>{s.value}</div>
+              {s.sub && <div style={{ fontSize: 11.5, opacity: 0.82, marginTop: 6 }}>{s.sub}</div>}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    function ProgressBlock({ items }) {
+      return (
+        <div>
+          {(items || []).map((p, i) => (
+            <div key={i} style={{ marginBottom: 14 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, marginBottom: 5 }}>
+                <span style={{ fontWeight: 600, color: C.navy }}>{p.label}</span>
+                <span style={{ color: C.muted }}>{p.valueLabel}</span>
+              </div>
+              <div style={{ height: 12, background: "#EEF0F4", borderRadius: 6, overflow: "hidden" }}>
+                <div style={{ width: `${p.pct}%`, height: "100%", background: col(p.color), borderRadius: 6 }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    function TableBlock({ columns, rows, rowToneKey }) {
+      const cols = columns || [];
+      return (
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
+            <thead>
+              <tr style={{ background: C.navy, color: "#fff" }}>
+                {cols.map((c, i) => <th key={i} style={{ padding: "9px 11px", textAlign: c.align || "left", fontWeight: 600, fontSize: 11.5 }}>{c.label}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {(rows || []).map((r, ri) => {
+                const tone = rowToneKey ? r[rowToneKey] : null;
+                const bg = tone === "hero" ? "rgba(110,138,114,.09)" : tone === "exp" ? "rgba(181,98,60,.06)" : "transparent";
+                return (
+                  <tr key={ri} style={{ borderBottom: `1px solid ${C.border}`, background: bg }}>
+                    {cols.map((c, ci) => {
+                      let color;
+                      if (c.muted) color = C.muted;
+                      if (c.tone === "navy") color = C.navy;
+                      if (c.tone === "atingido") color = num(r[c.key]) >= 100 ? C.sage : C.terracotta;
+                      let content = r[c.key];
+                      if (c.format) content = fmt(content, c.format);
+                      else if (content == null || content === "") content = "—";
+                      return <td key={ci} style={{ padding: "9px 11px", textAlign: c.align || "left", fontWeight: c.bold ? 700 : 400, color }}>{content}</td>;
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
+    function BarChartBlock({ spec }) {
+      const [vi, setVi] = useState(0);
+      const active = spec.variants ? Object.assign({}, spec, spec.variants[vi]) : spec;
+      const data = active.data || [];
+      const series = active.series || [];
+      const height = active.height || 300;
+      const tip = (val, name, p) => {
+        const vf = (active.tooltip && active.tooltip.valueFormat) || active.yFormat;
+        const out = fmt(val, vf);
+        if (active.tooltip && active.tooltip.extraKey) return [out, p && p.payload ? p.payload[active.tooltip.extraKey] : ""];
+        return [out, name];
+      };
+      const labelStyle = active.barLabelStyle || { fontSize: 10.5, fill: C.muted };
+      return (
+        <div>
+          {(active.subtitle || spec.variants) && (
+            <div style={{ display: "flex", justifyContent: active.subtitle ? "space-between" : "flex-end", alignItems: "center", marginBottom: 8, gap: 10, flexWrap: "wrap" }}>
+              {active.subtitle && <div style={{ fontSize: 12, fontWeight: 600, color: C.muted, textAlign: "center", flex: 1 }}>{active.subtitle}</div>}
+              {spec.variants && <Seg value={vi} onChange={setVi} options={spec.variants.map((v, i) => ({ value: i, label: v.label }))} />}
+            </div>
+          )}
+          <ResponsiveContainer width="100%" height={height}>
+            <BarChart data={data} margin={{ top: 24, right: 10, left: 0, bottom: 0 }} barCategoryGap={active.barGap || "26%"}>
+              <CartesianGrid stroke={C.border} vertical={false} />
+              <XAxis dataKey={active.xKey || "lb"} tick={{ fontSize: 11.5, fill: C.text }} axisLine={{ stroke: C.border }} tickLine={false} />
+              <YAxis domain={active.yDomain || [0, "auto"]} tickFormatter={(v) => fmt(v, active.yFormat)} tick={{ fontSize: 11.5, fill: C.muted }} axisLine={false} tickLine={false} width={active.yWidth || 46} />
+              <Tooltip contentStyle={{ background: C.navy, border: "none", borderRadius: 8, fontSize: 12 }} labelStyle={{ color: C.goldLight, fontFamily: "'Fraunces', serif" }} itemStyle={{ color: "#fff" }} formatter={tip} />
+              {active.referenceLine && <ReferenceLine y={active.referenceLine.y} stroke={C.navy} strokeDasharray="5 4" label={active.referenceLine.label ? { value: active.referenceLine.label, position: "right", fontSize: 11, fill: C.navy } : undefined} />}
+              {active.legend && <Legend wrapperStyle={{ fontSize: 11.5, paddingTop: 10 }} />}
+              {series.map((s, si) => {
+                const isLast = si === series.length - 1;
+                const radius = isLast ? [6, 6, 0, 0] : [0, 0, 0, 0];
+                const labelProp = (active.barLabelFormat && series.length === 1) ? { position: "top", formatter: (v) => fmt(v, active.barLabelFormat), ...labelStyle } : undefined;
+                return (
+                  <Bar key={si} dataKey={s.key} name={s.name || s.key} stackId={s.stackId} radius={radius} fill={col(s.color)} label={labelProp} fillOpacity={s.opacity == null ? 1 : s.opacity}>
+                    {s.colorKey && data.map((d, di) => <Cell key={di} fill={col(d[s.colorKey])} />)}
+                  </Bar>
+                );
+              })}
+            </BarChart>
+          </ResponsiveContainer>
+          {active.legendItems && (
+            <div style={{ display: "flex", gap: 18, marginTop: 12, fontSize: 12, color: C.muted, flexWrap: "wrap" }}>
+              {active.legendItems.map((l, i) => <span key={i}><span style={{ display: "inline-block", width: 10, height: 10, background: col(l.color), borderRadius: 3, marginRight: 6 }} />{l.label}</span>)}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function CardBlock({ block }) {
+      return (
+        <div style={{ background: C.surface, borderRadius: 16, padding: "23px 25px", border: `1px solid ${C.border}` }}>
+          <Title eyebrow={block.eyebrow} title={block.title} subtitle={block.subtitle} />
+          <Blocks list={block.blocks} />
+        </div>
+      );
+    }
+
+    function RowBlock({ block }) {
+      return (
+        <div style={{ display: "flex", gap: 22, flexWrap: "wrap" }}>
+          {(block.blocks || []).map((child, i) => (
+            <div key={i} style={{ flex: "1 1 340px", minWidth: 300 }}><Block block={child} /></div>
+          ))}
+        </div>
+      );
+    }
+
+    function Block({ block }) {
+      if (!block || !block.type) return null;
+      switch (block.type) {
+        case "kpis": return <KpisBlock items={block.items} />;
+        case "card": return <CardBlock block={block} />;
+        case "row": return <RowBlock block={block} />;
+        case "barChart": return <BarChartBlock spec={block} />;
+        case "note": return <Note tone={block.tone}>{rich(block.text)}</Note>;
+        case "banner": return <Banner tone={block.tone} text={block.text} />;
+        case "synthesis": return <Synthesis title={block.title} items={block.items} />;
+        case "callout": return <Callout title={block.title} text={block.text} />;
+        case "funnel": return <FunnelBlock steps={block.steps} />;
+        case "progress": return <ProgressBlock items={block.items} />;
+        case "table": return <TableBlock columns={block.columns} rows={block.rows} rowToneKey={block.rowToneKey} />;
+        case "heading": return <Title eyebrow={block.eyebrow} title={block.title} subtitle={block.subtitle} />;
+        case "text": return <p style={{ fontSize: 13.5, color: C.muted, lineHeight: 1.6, margin: 0, maxWidth: 760 }}>{rich(block.text)}</p>;
+        case "spacer": return <div style={{ height: block.size || 16 }} />;
+        default: return null;
+      }
+    }
+
+    function Blocks({ list, spacing }) {
+      return (list || []).map((b, i) => spacing
+        ? <div key={i} style={{ marginBottom: spacing }}><Block block={b} /></div>
+        : <Block key={i} block={b} />);
+    }
+
+    function ReportApp({ data }) {
+      const D = data || {};
+      const meta = D.meta || {};
+      let tabs = D.tabs;
+      if (!tabs || !tabs.length) tabs = [{ label: "", blocks: D.blocks || [] }];
+      const [tab, setTab] = useState(0);
+      const showTabs = tabs.length > 1;
+      const activeTab = tabs[Math.min(tab, tabs.length - 1)] || tabs[0];
+
+      return (
+        <div style={{ background: C.bg, minHeight: "100%", fontFamily: "Inter, sans-serif", color: C.text, padding: "28px 24px 44px" }}>
+          <div style={{ maxWidth: 1080, margin: "0 auto" }}>
+            <div style={{ marginBottom: 22 }}>
+              {meta.brand && <div style={{ fontSize: 10.5, letterSpacing: "0.11em", textTransform: "uppercase", color: C.gold, fontWeight: 700, marginBottom: 9 }}>{meta.brand}</div>}
+              {meta.title && <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 31, color: C.navy, margin: "0 0 9px", lineHeight: 1.2 }}>{meta.title}</h1>}
+              {meta.intro && <p style={{ color: C.muted, fontSize: 13.5, maxWidth: 720, margin: 0, lineHeight: 1.6 }}>{meta.intro}</p>}
+            </div>
+
+            {showTabs && (
+              <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 24, borderBottom: `1px solid ${C.border}`, paddingBottom: 13 }}>
+                {tabs.map((t, i) => (
+                  <button key={i} onClick={() => setTab(i)}
+                    style={{ border: "none", cursor: "pointer", padding: "8px 16px", borderRadius: 9, fontSize: 12.5, fontWeight: 600, fontFamily: "Inter, sans-serif", background: i === tab ? C.navy : "transparent", color: i === tab ? "#fff" : C.muted }}>
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <Blocks list={activeTab.blocks} spacing={22} />
+
+            {meta.readingNotes && (
+              <div style={{ background: C.surface, borderRadius: 14, padding: "18px 22px", border: `1px solid ${C.border}`, fontSize: 11.8, color: C.muted, lineHeight: 1.65, marginTop: 22 }}>{rich(meta.readingNotes)}</div>
+            )}
+            {meta.footer && <div style={{ marginTop: 16, fontSize: 11.5, color: C.muted, textAlign: "center" }}>{meta.footer}</div>}
+          </div>
+        </div>
+      );
+    }
+
+    window.ReportApp = ReportApp;
+  </script>
+
+  <!-- ============ ESTÚDIO (formulários + modo JSON) ============ -->
+  <script type="text/babel" data-presets="react">
+    const { useState, useEffect, useRef } = React;
+    const clone = (o) => JSON.parse(JSON.stringify(o));
+
+    // ---------------- MODELO AMIGÁVEL (usado pelos formulários) ----------------
+    const DEFAULT_MODEL = {
+      meta: {
+        brand: "Laskasas Portugal · Relatório de campanha",
+        title: "Dias Quentes — Agosto 2026",
+        intro: "Análise de resultados da campanha de verão. Este ano a campanha de saldos foi feita em maio e junho e voltou a acontecer em agosto, como nos anos anteriores. Maio e junho tiveram condicionantes próprias, que se assinalam adiante. Este relatório analisa a campanha de agosto no seu contexto.",
+        footer: "Laskasas Portugal · Campanha Dias Quentes · 6 a 31 de agosto de 2026",
+        readingNotes: "**Notas de leitura.** Vendas, objetivos e investimento são valores oficiais (ficheiro de vendas). Os dados de clientes novos, recorrentes, ticket médio e faixas de valor vêm do Artsoft, o CRM atual, que tem falhas conhecidas; são aproximados e não coincidem com os valores oficiais. O ticket médio é, por cliente, a soma das suas compras a dividir pelo número de compras. As vendas incluem lojas físicas e online, não sendo atribuíveis a plataformas de anúncios, pelo que os rácios são indicadores de negócio e não de atribuição. As entradas em loja usam o sistema de contagem atual, ativo desde novembro de 2025; períodos anteriores usaram um sistema com erros de contagem conhecidos e não são diretamente comparáveis.",
+      },
+      kpis: [
+        { eyebrow: "Objetivo atingido", value: "108%", sub: "1,94 M€ vendidos, sobre 1,80 M€ de objetivo", accent: "sage", artsoft: false },
+        { eyebrow: "Saldos de Mai/Jun", value: "74% e 84%", sub: "Ficaram abaixo do objetivo; tiveram condicionantes próprias", accent: "terracotta", artsoft: false },
+        { eyebrow: "Valor por visita ao site", value: "10,66 €", sub: "O mais alto desde que há tráfego comparável (2024+)", accent: "navy", artsoft: false },
+        { eyebrow: "Clientes novos", value: "290", sub: "Forte mês de aquisição, acima de Mai (213) e Jun (147)", accent: "gold", artsoft: true },
+      ],
+      arc2026: [
+        { lb: "Mai/26", sub: "Saldos −35%", ating: 74.3, tone: "exp" },
+        { lb: "Jun/26", sub: "Saldos −40%", ating: 83.5, tone: "exp" },
+        { lb: "Ago/26", sub: "Dias Quentes −45%", ating: 108.0, tone: "hero" },
+      ],
+      sintese: [
+        { lead: "Agosto cumpriu o objetivo.", text: "Atingiu 108% da meta (1,94 M€ sobre 1,80 M€), o segundo melhor cumprimento da série, alinhado com os agostos de 2024 e 2025." },
+        { lead: "Maio e junho ficaram abaixo.", text: "74% e 84% do objetivo. Junho teve uma comunicação mais afastada da essência da marca, por exigência superior; maio foi idealizado pela equipa." },
+        { lead: "Comunicação própria da marca.", text: "Agosto foi comunicado com a linguagem habitual da Laskasas, ao contrário de junho, e com desconto até 45%." },
+        { lead: "Mais valor por visita ao site, menos por visita à loja.", text: "Agosto vendeu mais com menos tráfego online, mas a conversão em loja foi inferior à de maio e junho." },
+      ],
+      camp: [
+        { lb: "Ago/22", camp: "Dias Quentes", disc: "−25%", inv: 22539, obj: 1295954, vnd: 1618133, ating: 124.9, exp: false, hero: false },
+        { lb: "Ago/23", camp: "Dias Quentes", disc: "−30%", inv: 28575, obj: 1620686, vnd: 1534191, ating: 94.7, exp: false, hero: false },
+        { lb: "Ago/24", camp: "Dias Quentes", disc: "−35%", inv: 35181, obj: 1766555, vnd: 1806074, ating: 102.2, exp: false, hero: false },
+        { lb: "Ago/25", camp: "Saldos Verão", disc: "−35%", inv: 36975, obj: 2184654, vnd: 2253295, ating: 103.1, exp: false, hero: false },
+        { lb: "Mai/26", camp: "Saldos", disc: "−35%", inv: 40639, obj: 2316000, vnd: 1721803, ating: 74.3, exp: true, hero: false },
+        { lb: "Jun/26", camp: "Saldos", disc: "−40%", inv: 31042, obj: 1608939, vnd: 1343361, ating: 83.5, exp: true, hero: false },
+        { lb: "Ago/26", camp: "Dias Quentes", disc: "−45%", inv: 45907, obj: 1800000, vnd: 1943983, ating: 108.0, exp: false, hero: true },
+      ],
+      resultadoNote: "**Agosto de 2026 (108%) foi o segundo melhor cumprimento de objetivo da série, atrás apenas de agosto de 2022 (124,9%), que teve um objetivo bastante mais baixo.** As duas campanhas abaixo dos 95% são maio e junho de 2026. Em valor absoluto, agosto de 2025 vendeu mais (2,25 M€ contra 1,94 M€), com um objetivo também mais alto. Cada mês foi medido por uma fasquia diferente.",
+      campTableNote: "Valores oficiais de vendas e investimento em paid media. A profundidade do desconto subiu ano após ano, de 25% em 2022 até 45% em 2026.",
+      funnel: [
+        { lbl: "Investimento", val: "45.907 €", sub: "abaixo do teto planeado de ~50.000 €", cor: "navy" },
+        { lbl: "Visitas ao site", val: "182.343", sub: "sessões no mês", cor: "navyLight" },
+        { lbl: "Visitas às lojas", val: "8.587", sub: "entradas registadas", cor: "goldLight" },
+        { lbl: "Vendas", val: "1,94 M€", sub: "108% do objetivo", cor: "sage" },
+      ],
+      fatorTitle: "Um fator que ajuda a explicar o resultado",
+      fatorText: "Agosto foi a primeira promoção agressiva depois de um mês inteiro a preço cheio. Julho de 2026 não teve campanha, ao contrário do que antecedeu maio ou junho. Foi o pior julho da série em vendas, mas deixou a procura intacta para agosto: quando não se satura o cliente no mês anterior, a campanha seguinte encontra o terreno preparado.",
+      online: [
+        { lb: "Ago/24", custo: 0.181, vsess: 9.29, sess: 194330, exp: false, hero: false },
+        { lb: "Ago/25", custo: 0.143, vsess: 8.73, sess: 258202, exp: false, hero: false },
+        { lb: "Mai/26", custo: 0.195, vsess: 8.28, sess: 207910, exp: true, hero: false },
+        { lb: "Jun/26", custo: 0.132, vsess: 5.71, sess: 235347, exp: true, hero: false },
+        { lb: "Ago/26", custo: 0.252, vsess: 10.66, sess: 182343, exp: false, hero: true },
+      ],
+      onlineNote: "**Mais caro à entrada, melhor à saída.** Agosto foi o mês em que cada visita ao site custou mais (0,25 €), por ter investido mais e recebido menos tráfego. Mas cada visita rendeu 10,66 €, o valor mais alto desde que há tráfego comparável.",
+      loja: [
+        { lb: "Ago/24", custo: 8.06, vent: 414, ent: 4367, fiavel: false, exp: false, hero: false },
+        { lb: "Ago/25", custo: 10.32, vent: 629, ent: 3582, fiavel: false, exp: false, hero: false },
+        { lb: "Mai/26", custo: 6.60, vent: 279, ent: 6161, fiavel: true, exp: true, hero: false },
+        { lb: "Jun/26", custo: 6.40, vent: 277, ent: 4847, fiavel: true, exp: true, hero: false },
+        { lb: "Ago/26", custo: 5.35, vent: 226, ent: 8587, fiavel: true, exp: false, hero: true },
+      ],
+      lojaNote: "**Encheu as lojas, mas a loja não converteu tão bem.** Agosto trouxe visitantes à loja ao custo mais baixo (5,35 € por entrada) e em muito maior número (8.587). Mas cada visita rendeu apenas 226 €, abaixo dos 279 € de maio e 277 € de junho. É o ponto do mês com mais margem para melhorar.",
+      plataforma: [
+        { nome: "Facebook e Instagram", val: 32518, pct: 71, cor: "#172033" },
+        { nome: "Google", val: 12010, pct: 26, cor: "#4F46E5" },
+        { nome: "Rede de websites", val: 1379, pct: 3, cor: "#98A2B3" },
+      ],
+      plataformaNote: "O grosso do investimento foi para Facebook e Instagram, seguido do Google. A rede de websites teve um papel de reforço de exposição no arranque.",
+      artSourceNote: "**Nota sobre a fonte.** Os dados desta secção vêm do Artsoft, o CRM atual, que tem falhas conhecidas. Os totais não coincidem com o ficheiro oficial de vendas, pelo que servem para ler tendências e composição, não valores absolutos.",
+      art: [
+        { lb: "Ago/23", novos: 338, recor: 66, ticket: 2531, vNovos: 996312, vRecor: 248983, alto: 47.2, medio: 34.9, baixo: 15.8, ab900: 2.1 },
+        { lb: "Ago/24", novos: 270, recor: 148, ticket: 2733, vNovos: 840382, vRecor: 509213, alto: 51.7, medio: 32.7, baixo: 13.9, ab900: 1.7 },
+        { lb: "Ago/25", novos: 300, recor: 204, ticket: 2323, vNovos: 968194, vRecor: 464630, alto: 44.6, medio: 39.9, baixo: 14.4, ab900: 1.2 },
+        { lb: "Mai/26", novos: 213, recor: 173, ticket: 2661, vNovos: 707985, vRecor: 546974, alto: 58.6, medio: 28.2, baixo: 11.5, ab900: 1.7 },
+        { lb: "Jun/26", novos: 147, recor: 156, ticket: 2932, vNovos: 549648, vRecor: 477501, alto: 61.7, medio: 25.2, baixo: 11.8, ab900: 1.3 },
+        { lb: "Ago/26", novos: 290, recor: 220, ticket: 2703, vNovos: 973579, vRecor: 712775, alto: 53.5, medio: 31.0, baixo: 14.1, ab900: 1.4 },
+      ],
+      artNote: "**Agosto teve uma divisão equilibrada entre novos e recorrentes.** Cerca de 57% novos e 43% recorrentes. É mais equilibrada do que os agostos anteriores (84% novos em 2023, 65% em 2024, 60% em 2025). Dados do Artsoft, aproximados.",
+      recencia: [
+        { faixa: "Até 6 meses", n: 118, pct: 54 },
+        { faixa: "6 a 12 meses", n: 49, pct: 22 },
+        { faixa: "1 a 2 anos", n: 32, pct: 15 },
+        { faixa: "2 a 5 anos", n: 21, pct: 10 },
+      ],
+      recenciaNote: "**Os recorrentes de agosto são clientes recentes, não adormecidos.** Mais de metade (54%) já tinha comprado nos últimos seis meses e três quartos (76%) no último ano. **Ressalva:** o histórico disponível começa em fevereiro de 2023, por isso a recência máxima medível é de cerca de três anos e meio.",
+      ticketNote: "O ticket médio de agosto (2.703 €) ficou acima do de agosto de 2025 (2.323 €), apesar de o desconto ter sido mais profundo. O desconto atraiu procura sem destruir o valor médio da compra.",
+      faixasNote: "Em agosto, as compras de valor alto pesaram 53,5% da receita, mais do que em agosto de 2025 (44,6%) mas menos do que em maio (58,6%) e junho (61,7%). Dados do Artsoft, aproximados.",
+    };
+
+    // ---------------- MODELO -> RELATÓRIO GENÉRICO (blocos) ----------------
+    const eur0 = (v) => new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(Number(v) || 0);
+    const ptn = (v) => (Number(v) || 0).toLocaleString("pt-PT");
+    const campColor = (r) => r.hero ? "sage" : (r.exp ? "terracotta" : "slate");
+
+    function modelToReport(m) {
+      const camp = m.camp.map((r) => Object.assign({}, r, { sub: `${r.camp} ${r.disc}`, color: campColor(r), _tone: r.hero ? "hero" : (r.exp ? "exp" : null) }));
+      const online = m.online.map((r) => Object.assign({}, r, { color: campColor(r), sessLabel: `${ptn(r.sess)} visitas` }));
+      const loja = m.loja.map((r) => Object.assign({}, r, { color: !r.fiavel ? "slate" : campColor(r), fiavelLabel: r.fiavel ? "sistema fiável" : "sistema antigo", entLabel: `${ptn(r.ent)} entradas · ${r.fiavel ? "fiável" : "sistema antigo"}` }));
+      const arc = m.arc2026.map((r) => Object.assign({}, r, { color: r.tone === "hero" ? "sage" : "terracotta" }));
+      const rec = m.recencia.map((r, i) => Object.assign({}, r, { color: i === 0 ? "sage" : "slate", recExtra: "Desde a compra anterior" }));
+      const ticket = m.art.map((r, i, a) => Object.assign({}, r, { color: i === a.length - 1 ? "sage" : "slate" }));
+
+      return {
+        meta: clone(m.meta),
+        tabs: [
+          {
+            label: "Veredicto",
+            blocks: [
+              { type: "kpis", items: m.kpis.map((k) => ({ eyebrow: k.eyebrow, value: k.value, sub: k.sub, accent: k.accent, footnote: k.artsoft ? "fonte: Artsoft (aprox.)" : null })) },
+              { type: "card", eyebrow: "Saldos do ano", title: "Cumprimento do objetivo por campanha", subtitle: "Percentagem do objetivo comercial atingida pelas campanhas de desconto profundo. A linha marca os 100%.", blocks: [
+                { type: "barChart", data: arc, xKey: "lb", height: 330, yFormat: "percent", yDomain: [0, 120], referenceLine: { y: 100, label: "objetivo" }, barLabelFormat: "percent", barLabelStyle: { fontSize: 14, fill: "#172033", fontWeight: 700 }, series: [{ key: "ating", colorKey: "color" }], tooltip: { valueFormat: "percent", extraKey: "sub" }, legendItems: [{ color: "terracotta", label: "Abaixo do objetivo" }, { color: "sage", label: "Campanha em destaque" }] },
+              ] },
+              { type: "synthesis", title: "Síntese", items: m.sintese },
+            ],
+          },
+          {
+            label: "Resultado comercial",
+            blocks: [
+              { type: "card", eyebrow: "Contexto completo", title: "A campanha face a todas as campanhas de verão", subtitle: "Alterna entre o cumprimento do objetivo e o valor de vendas.", blocks: [
+                { type: "barChart", data: camp, xKey: "lb", height: 340, yWidth: 52, tooltip: { extraKey: "sub" }, legendItems: [{ color: "sage", label: "Campanha em destaque" }, { color: "terracotta", label: "Abaixo do objetivo" }, { color: "slate", label: "Restantes campanhas" }], variants: [
+                  { label: "Objetivo atingido", series: [{ key: "ating", colorKey: "color" }], yFormat: "percent", yDomain: [0, 135], referenceLine: { y: 100 }, tooltip: { valueFormat: "percent", extraKey: "sub" } },
+                  { label: "Vendas (€)", series: [{ key: "vnd", colorKey: "color" }], yFormat: "eurM", tooltip: { valueFormat: "eur", extraKey: "sub" } },
+                ] },
+                { type: "note", tone: "good", text: m.resultadoNote },
+              ] },
+              { type: "card", eyebrow: "Detalhe", title: "Quadro das campanhas de verão", subtitle: m.campTableNote, blocks: [
+                { type: "table", rowToneKey: "_tone", columns: [
+                  { key: "lb", label: "Mês", align: "left", bold: true, tone: "navy" },
+                  { key: "camp", label: "Campanha", align: "left" },
+                  { key: "disc", label: "Desconto", align: "left", muted: true },
+                  { key: "inv", label: "Investimento", align: "right", format: "eur" },
+                  { key: "obj", label: "Objetivo", align: "right", format: "eur", muted: true },
+                  { key: "vnd", label: "Vendas", align: "right", format: "eur" },
+                  { key: "ating", label: "Atingido", align: "right", format: "percent", bold: true, tone: "atingido" },
+                ], rows: camp },
+              ] },
+            ],
+          },
+          {
+            label: "Funil e eficiência",
+            blocks: [
+              { type: "card", eyebrow: "Campanha em análise", title: "Do investimento à venda", subtitle: "As quatro etapas da campanha, do euro investido à venda gerada.", blocks: [
+                { type: "funnel", steps: m.funnel.map((f) => ({ label: f.lbl, value: f.val, sub: f.sub, color: f.cor })) },
+              ] },
+              (m.fatorTitle || m.fatorText) ? { type: "callout", title: m.fatorTitle, text: m.fatorText } : { type: "spacer", size: 0 },
+              { type: "card", eyebrow: "Eficiência online", title: "O que pagámos e o que rendeu cada visita ao site", subtitle: "À esquerda, o custo por visita; à direita, o valor gerado por visita.", blocks: [
+                { type: "row", blocks: [
+                  { type: "barChart", subtitle: "Custo por visita ao site", data: online, xKey: "lb", height: 250, yFormat: "eur2", barLabelFormat: "eur2", series: [{ key: "custo", colorKey: "color" }], tooltip: { valueFormat: "eur3" } },
+                  { type: "barChart", subtitle: "Vendas por visita ao site", data: online, xKey: "lb", height: 250, yFormat: "eurPlain", barLabelFormat: "eurPlain", series: [{ key: "vsess", colorKey: "color" }], tooltip: { valueFormat: "eurPlain", extraKey: "sessLabel" } },
+                ] },
+                { type: "note", tone: "good", text: m.onlineNote },
+              ] },
+              { type: "card", eyebrow: "Eficiência em loja", title: "O que pagámos e o que rendeu cada visita à loja", subtitle: "As barras a cinzento usaram um sistema antigo com erros de contagem e não são comparáveis.", blocks: [
+                { type: "row", blocks: [
+                  { type: "barChart", subtitle: "Custo por visita à loja", data: loja, xKey: "lb", height: 250, yFormat: "eurPlain", barLabelFormat: "eur1", series: [{ key: "custo", colorKey: "color" }], tooltip: { valueFormat: "eur2", extraKey: "fiavelLabel" } },
+                  { type: "barChart", subtitle: "Vendas por visita à loja", data: loja, xKey: "lb", height: 250, yFormat: "eurPlain", barLabelFormat: "eurPlain", series: [{ key: "vent", colorKey: "color" }], tooltip: { valueFormat: "eurPlain", extraKey: "entLabel" } },
+                ] },
+                { type: "note", tone: "warn", text: m.lojaNote },
+              ] },
+              { type: "card", eyebrow: "Onde foi investido", title: "Repartição por meio", blocks: [
+                { type: "progress", items: m.plataforma.map((p) => ({ label: p.nome, valueLabel: `${eur0(p.val)} · ${p.pct}%`, pct: p.pct, color: p.cor })) },
+                { type: "note", text: m.plataformaNote },
+              ] },
+            ],
+          },
+          {
+            label: "Quem comprou",
+            blocks: [
+              { type: "banner", tone: "gold", text: m.artSourceNote },
+              { type: "card", eyebrow: "Aquisição vs retenção", title: "Clientes novos e recorrentes por campanha", subtitle: "Alterna entre número de clientes e valor gerado por cada grupo.", blocks: [
+                { type: "barChart", data: m.art, xKey: "lb", height: 320, legend: true, yWidth: 50, variants: [
+                  { label: "Nº de clientes", yFormat: "number", series: [{ key: "novos", name: "Clientes novos", color: "sage", stackId: "a" }, { key: "recor", name: "Clientes recorrentes", color: "navy", stackId: "a" }] },
+                  { label: "Valor (€)", yFormat: "kEur", tooltip: { valueFormat: "eur" }, series: [{ key: "vNovos", name: "Clientes novos", color: "sage", stackId: "a" }, { key: "vRecor", name: "Clientes recorrentes", color: "navy", stackId: "a" }] },
+                ] },
+                { type: "note", tone: "good", text: m.artNote },
+              ] },
+              { type: "card", eyebrow: "Recência", title: "Há quanto tempo tinham comprado os clientes recorrentes", subtitle: "Dos clientes recorrentes da campanha, há quanto tempo foi a compra anterior.", blocks: [
+                { type: "barChart", data: rec, xKey: "faixa", height: 260, yFormat: "percent", barLabelFormat: "percent", series: [{ key: "pct", colorKey: "color" }], tooltip: { valueFormat: "percent", extraKey: "recExtra" } },
+                { type: "note", text: m.recenciaNote },
+              ] },
+              { type: "row", blocks: [
+                { type: "card", eyebrow: "Ticket médio", title: "Valor médio por compra", subtitle: "Valor médio por compra em cada campanha.", blocks: [
+                  { type: "barChart", data: ticket, xKey: "lb", height: 250, yFormat: "kEur", series: [{ key: "ticket", colorKey: "color" }], tooltip: { valueFormat: "eur" } },
+                  { type: "note", text: m.ticketNote },
+                ] },
+                { type: "card", eyebrow: "Faixas de valor", title: "Peso de cada faixa na receita", subtitle: "Percentagem da receita por faixa de valor da compra.", blocks: [
+                  { type: "barChart", data: m.art, xKey: "lb", height: 250, legend: true, yFormat: "percent", yDomain: [0, 100], tooltip: { valueFormat: "percent" }, series: [
+                    { key: "alto", name: "Alto (5.000€+)", color: "navy", stackId: "a" },
+                    { key: "medio", name: "Médio (2.000–4.999€)", color: "gold", stackId: "a" },
+                    { key: "baixo", name: "Baixo (900–1.999€)", color: "slate", stackId: "a" },
+                    { key: "ab900", name: "Abaixo 900€", color: "terracotta", stackId: "a" },
+                  ] },
+                  { type: "note", text: m.faixasNote },
+                ] },
+              ] },
+            ],
+          },
+        ],
+      };
+    }
+
+    // ---------------- INSTRUÇÕES PARA O CLAUDE ----------------
+    const CLAUDE_PROMPT = [
+      "Preciso que geres um ficheiro JSON para o meu relatório interativo. Devolve APENAS JSON válido, sem comentários.",
+      "",
+      "Estrutura de topo:",
+      '{ "meta": { "brand", "title", "intro", "footer", "readingNotes" }, "tabs": [ { "label": "Nome da aba", "blocks": [ ...blocos ] } ] }',
+      "- tabs é uma lista. Podes ter 1 aba (a barra de abas fica escondida) ou várias.",
+      "- Em qualquer texto, envolve uma expressão em **duplo asterisco** para a pôr a negrito.",
+      "- Cores aceitam um nome (navy, navyLight, sage, terracotta, gold, goldLight, slate) ou um hex tipo \"#4F46E5\".",
+      "- Formatos de número (campo yFormat / format / valueFormat): percent, percent1, eur, eurM, eur2M, kEur, eur2, eur1, eur3, eurPlain, number.",
+      "",
+      "Tipos de bloco disponíveis (cada bloco é um objeto com \"type\"):",
+      '• kpis:      { "type":"kpis", "items":[ { "eyebrow","value","sub","accent","footnote" } ] }',
+      '• card:      { "type":"card", "eyebrow","title","subtitle", "blocks":[ ... ] }  (agrupa blocos com um cabeçalho)',
+      '• row:       { "type":"row", "blocks":[ ... ] }  (coloca os blocos lado a lado)',
+      '• barChart:  { "type":"barChart", "data":[...], "xKey":"lb", "height":300,',
+      '               "series":[ { "key","name","color","colorKey","stackId" } ],',
+      '               "yFormat","yDomain":[0,100],"referenceLine":{"y":100,"label":"objetivo"},',
+      '               "barLabelFormat","tooltip":{"valueFormat","extraKey"},',
+      '               "legend":true, "legendItems":[{"color","label"}],',
+      '               "variants":[ { "label":"Botão", ...campos que mudam (series/yFormat/tooltip) } ] }',
+      '               (colorKey aponta um campo de cada linha de data com a cor dessa barra; variants cria um seletor)',
+      '• table:     { "type":"table", "rowToneKey":"_tone", "columns":[ { "key","label","align","format","bold","muted","tone" } ], "rows":[...] }',
+      '               (tone:"navy" pinta a célula; tone:"atingido" fica verde se >=100 e vermelho se <100)',
+      '• note:      { "type":"note", "tone":"good|warn|gold|neutral", "text":"..." }',
+      '• banner:    { "type":"banner", "tone":"gold", "text":"..." }  (caixa de aviso com moldura)',
+      '• synthesis: { "type":"synthesis", "title":"Síntese", "items":[ { "lead","text" } ] }  (caixa escura)',
+      '• callout:   { "type":"callout", "title":"...", "text":"..." }  (caixa escura de destaque)',
+      '• funnel:    { "type":"funnel", "steps":[ { "label","value","sub","color" } ] }',
+      '• progress:  { "type":"progress", "items":[ { "label","valueLabel","pct","color" } ] }',
+      '• heading:   { "type":"heading", "eyebrow","title","subtitle" }',
+      '• text:      { "type":"text", "text":"parágrafo simples" }',
+      "",
+      "Os dados que te vou dar são: [COLA AQUI OS TEUS DADOS]. Preenche o JSON com base neles.",
+    ].join("\n");
+
+    // ---------------- geração do index.html autónomo ----------------
+    function buildStandalone(reportObj, reportSrc) {
+      const S = "<scr" + "ipt", E = "</scr" + "ipt>";
+      const cdn = [
+        S + ' crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js">' + E,
+        S + ' crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js">' + E,
+        S + ' crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js">' + E,
+        S + ' crossorigin src="https://cdn.jsdelivr.net/npm/recharts@2.12.7/umd/Recharts.min.js">' + E,
+        S + ' src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.26.4/babel.min.js">' + E,
+      ].join("\n  ");
+      const app = S + ' type="text/babel" data-presets="react">\n' + reportSrc + "\n\n" +
+        "    const DATA = " + JSON.stringify(reportObj).replace(/</g, "\\u003c") + ";\n" +
+        "    const root = ReactDOM.createRoot(document.getElementById('root'));\n" +
+        "    root.render(React.createElement(window.ReportApp, { data: DATA }));\n" +
+        "    const boot = document.getElementById('boot'); if (boot) { boot.style.opacity='0'; setTimeout(function(){boot.remove();}, 300); }\n  " + E;
+      const title = (reportObj.meta && reportObj.meta.title) ? reportObj.meta.title : "Relatório";
+      return [
+        "<!DOCTYPE html>", '<html lang="pt-PT">', "<head>",
+        '  <meta charset="UTF-8" />', '  <meta name="viewport" content="width=device-width, initial-scale=1.0" />',
+        "  <title>" + title + "</title>",
+        '  <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />',
+        '  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />',
+        "  <style>",
+        "    * { box-sizing: border-box; } html, body { margin: 0; padding: 0; }",
+        '    body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #F7F8FA; -webkit-font-smoothing: antialiased; }',
+        "    #root { min-height: 100vh; }",
+        "    #boot { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; background: #F7F8FA; color: #667085; font-size: 13.5px; transition: opacity .3s ease; }",
+        "    #boot .spin { width: 26px; height: 26px; border-radius: 50%; border: 2.5px solid #E4E7EC; border-top-color: #4F46E5; animation: spin .8s linear infinite; }",
+        "    @keyframes spin { to { transform: rotate(360deg); } }",
+        "  </style>", "</head>", "<body>",
+        '  <div id="boot"><div class="spin"></div><div>A carregar o relatório…</div></div>',
+        '  <div id="root"></div>',
+        "  " + cdn, "  " + app, "</body>", "</html>", "",
+      ].join("\n");
+    }
+
+    function download(filename, text, mime) {
+      const blob = new Blob([text], { type: (mime || "text/plain") + ";charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = filename; document.body.appendChild(a); a.click();
+      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+    }
+
+    // ---------------- controlos de formulário ----------------
+    function Field({ label, value, onChange, type = "text", area, step }) {
+      return (
+        <div className="field">
+          <label>{label}</label>
+          {area
+            ? <textarea value={value == null ? "" : value} onChange={(e) => onChange(e.target.value)} rows={area === true ? 3 : area} />
+            : <input type={type} step={step} value={value == null ? "" : value} onChange={(e) => onChange(type === "number" ? (e.target.value === "" ? "" : Number(e.target.value)) : e.target.value)} />}
+        </div>
+      );
+    }
+
+    function TableEditor({ columns, rows, onChange, blank }) {
+      const setCell = (ri, key, val) => onChange(rows.map((r, i) => i === ri ? Object.assign({}, r, { [key]: val }) : r));
+      return (
+        <div>
+          <div className="tbl-wrap">
+            <table className="editor-tbl">
+              <thead><tr>{columns.map((c) => <th key={c.key}>{c.label}</th>)}<th></th></tr></thead>
+              <tbody>
+                {rows.map((r, ri) => (
+                  <tr key={ri}>
+                    {columns.map((c) => (
+                      <td key={c.key}>
+                        {c.type === "select" ? (
+                          <select value={r[c.key]} onChange={(e) => setCell(ri, c.key, e.target.value)}>{c.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}</select>
+                        ) : c.type === "checkbox" ? (
+                          <input type="checkbox" checked={!!r[c.key]} onChange={(e) => setCell(ri, c.key, e.target.checked)} />
+                        ) : c.type === "color" ? (
+                          <input type="color" value={r[c.key] || "#172033"} onChange={(e) => setCell(ri, c.key, e.target.value)} />
+                        ) : (
+                          <input type={c.type || "text"} step={c.step} value={r[c.key] == null ? "" : r[c.key]} onChange={(e) => setCell(ri, c.key, c.type === "number" ? (e.target.value === "" ? "" : Number(e.target.value)) : e.target.value)} />
+                        )}
+                      </td>
+                    ))}
+                    <td><button className="row-del" title="Remover" onClick={() => onChange(rows.filter((_, i) => i !== ri))}>×</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <button className="add-row" onClick={() => onChange([...rows, clone(blank)])}>+ Adicionar linha</button>
+        </div>
+      );
+    }
+
+    function Section({ eyebrow, title, children, open }) {
+      return (
+        <details className="section" open={open}>
+          <summary><span className="chev">▶</span><span>{title}</span><span className="eyebrow" style={{ marginLeft: "auto" }}>{eyebrow}</span></summary>
+          <div className="section-body">{children}</div>
+        </details>
+      );
+    }
+
+    const ACCENTS = [{ value: "navy", label: "Escuro" }, { value: "sage", label: "Sucesso" }, { value: "terracotta", label: "Negativo" }, { value: "gold", label: "Destaque" }, { value: "navyLight", label: "Primária" }, { value: "slate", label: "Neutro" }];
+    const TONES = [{ value: "hero", label: "Destaque (sucesso)" }, { value: "exp", label: "Exceção (negativo)" }];
+
+    const STORE_MODEL = "laskasas-report-model-v1";
+    const STORE_JSON = "laskasas-report-json-v2";
+    const STORE_MODE = "laskasas-report-mode";
+
+    function loadModel() { try { const r = localStorage.getItem(STORE_MODEL); if (r) return Object.assign(clone(DEFAULT_MODEL), JSON.parse(r)); } catch (e) {} return clone(DEFAULT_MODEL); }
+    function loadJson() { try { const r = localStorage.getItem(STORE_JSON); if (r) return r; } catch (e) {} return JSON.stringify(modelToReport(DEFAULT_MODEL), null, 2); }
+    function loadMode() { try { return localStorage.getItem(STORE_MODE) || "form"; } catch (e) { return "form"; } }
+
+    function Preview({ data }) {
+      if (!window.ReportApp || !data) return <div style={{ padding: 40, color: "#667085" }}>Sem pré-visualização.</div>;
+      return React.createElement(window.ReportApp, { data });
+    }
+
+    function App() {
+      const [mode, setMode] = useState(loadMode);
+      const [model, setModel] = useState(loadModel);
+      const [jsonText, setJsonText] = useState(loadJson);
+      const [preview, setPreview] = useState(null);
+      const [jsonError, setJsonError] = useState("");
+      const [saved, setSaved] = useState("");
+      const importRef = useRef(null);
+      const reportSrc = () => document.getElementById("reportSrc").textContent;
+
+      // autosave + preview (formulário)
+      useEffect(() => {
+        try { localStorage.setItem(STORE_MODEL, JSON.stringify(model)); setSaved("guardado ✓"); } catch (e) { setSaved("sem localStorage"); }
+        if (mode === "form") { const t = setTimeout(() => setPreview(modelToReport(model)), 200); return () => clearTimeout(t); }
+      }, [model, mode]);
+
+      // autosave + preview (JSON)
+      useEffect(() => {
+        try { localStorage.setItem(STORE_JSON, jsonText); } catch (e) {}
+        if (mode === "json") {
+          const t = setTimeout(() => {
+            try { const p = JSON.parse(jsonText); setJsonError(""); setPreview(p); }
+            catch (e) { setJsonError(e.message); }
+          }, 250);
+          return () => clearTimeout(t);
+        }
+      }, [jsonText, mode]);
+
+      useEffect(() => { try { localStorage.setItem(STORE_MODE, mode); } catch (e) {} }, [mode]);
+
+      const set = (key, val) => setModel((d) => Object.assign({}, d, { [key]: val }));
+      const setMeta = (key, val) => setModel((d) => Object.assign({}, d, { meta: Object.assign({}, d.meta, { [key]: val }) }));
+      const setList = (key, rows) => setModel((d) => Object.assign({}, d, { [key]: rows }));
+
+      const currentReport = () => mode === "form" ? modelToReport(model) : (() => { try { return JSON.parse(jsonText); } catch (e) { alert("O JSON tem um erro e não pode ser exportado:\n" + e.message); return null; } })();
+      const onExportHtml = () => { const r = currentReport(); if (r) download("index.html", buildStandalone(r, reportSrc()), "text/html"); };
+
+      const onExportModel = () => download("report-model.json", JSON.stringify(model, null, 2), "application/json");
+      const onExportJson = () => { const r = currentReport(); if (r) download("report.json", JSON.stringify(r, null, 2), "application/json"); };
+      const onImportModel = (e) => { const f = e.target.files && e.target.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = () => { try { setModel(Object.assign(clone(DEFAULT_MODEL), JSON.parse(rd.result))); } catch (err) { alert("JSON inválido."); } }; rd.readAsText(f); e.target.value = ""; };
+      const onImportJson = (e) => { const f = e.target.files && e.target.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = () => { setJsonText(String(rd.result)); }; rd.readAsText(f); e.target.value = ""; };
+
+      const onFormat = () => { try { setJsonText(JSON.stringify(JSON.parse(jsonText), null, 2)); } catch (e) { alert("Não é possível formatar: JSON inválido.\n" + e.message); } };
+      const onCopyPrompt = () => { try { navigator.clipboard.writeText(CLAUDE_PROMPT); alert("Instruções copiadas para a área de transferência."); } catch (e) { alert("Copia manualmente o texto abaixo."); } };
+      const onResetModel = () => { if (confirm("Repor os formulários para os valores por defeito?")) setModel(clone(DEFAULT_MODEL)); };
+      const onResetJson = () => { if (confirm("Substituir o JSON pelo exemplo por defeito?")) setJsonText(JSON.stringify(modelToReport(DEFAULT_MODEL), null, 2)); };
+      const onFormToJson = () => { setJsonText(JSON.stringify(modelToReport(model), null, 2)); setMode("json"); };
+
+      const kpiCols = [{ key: "eyebrow", label: "Rótulo", type: "text" }, { key: "value", label: "Valor", type: "text" }, { key: "sub", label: "Descrição", type: "text" }, { key: "accent", label: "Cor", type: "select", options: ACCENTS }, { key: "artsoft", label: "Artsoft?", type: "checkbox" }];
+      const arcCols = [{ key: "lb", label: "Rótulo", type: "text" }, { key: "sub", label: "Subtítulo", type: "text" }, { key: "ating", label: "% objetivo", type: "number", step: "0.1" }, { key: "tone", label: "Cor", type: "select", options: TONES }];
+      const sinteseCols = [{ key: "lead", label: "Destaque (negrito)", type: "text" }, { key: "text", label: "Texto", type: "text" }];
+      const campCols = [{ key: "lb", label: "Mês", type: "text" }, { key: "camp", label: "Campanha", type: "text" }, { key: "disc", label: "Desconto", type: "text" }, { key: "inv", label: "Investim.", type: "number" }, { key: "obj", label: "Objetivo", type: "number" }, { key: "vnd", label: "Vendas", type: "number" }, { key: "ating", label: "% atingido", type: "number", step: "0.1" }, { key: "exp", label: "Abaixo?", type: "checkbox" }, { key: "hero", label: "Destaque?", type: "checkbox" }];
+      const funnelCols = [{ key: "lbl", label: "Etapa", type: "text" }, { key: "val", label: "Valor", type: "text" }, { key: "sub", label: "Descrição", type: "text" }, { key: "cor", label: "Cor", type: "select", options: ACCENTS }];
+      const onlineCols = [{ key: "lb", label: "Mês", type: "text" }, { key: "custo", label: "Custo/visita", type: "number", step: "0.001" }, { key: "vsess", label: "Vendas/visita", type: "number", step: "0.01" }, { key: "sess", label: "Sessões", type: "number" }, { key: "exp", label: "Abaixo?", type: "checkbox" }, { key: "hero", label: "Destaque?", type: "checkbox" }];
+      const lojaCols = [{ key: "lb", label: "Mês", type: "text" }, { key: "custo", label: "Custo/visita", type: "number", step: "0.01" }, { key: "vent", label: "Vendas/entrada", type: "number" }, { key: "ent", label: "Entradas", type: "number" }, { key: "fiavel", label: "Fiável?", type: "checkbox" }, { key: "exp", label: "Abaixo?", type: "checkbox" }, { key: "hero", label: "Destaque?", type: "checkbox" }];
+      const platCols = [{ key: "nome", label: "Meio", type: "text" }, { key: "val", label: "Valor €", type: "number" }, { key: "pct", label: "%", type: "number" }, { key: "cor", label: "Cor", type: "color" }];
+      const artCols = [{ key: "lb", label: "Mês", type: "text" }, { key: "novos", label: "Novos", type: "number" }, { key: "recor", label: "Recor.", type: "number" }, { key: "ticket", label: "Ticket €", type: "number" }, { key: "vNovos", label: "Valor novos", type: "number" }, { key: "vRecor", label: "Valor recor.", type: "number" }, { key: "alto", label: "% Alto", type: "number", step: "0.1" }, { key: "medio", label: "% Médio", type: "number", step: "0.1" }, { key: "baixo", label: "% Baixo", type: "number", step: "0.1" }, { key: "ab900", label: "% <900", type: "number", step: "0.1" }];
+      const recCols = [{ key: "faixa", label: "Faixa", type: "text" }, { key: "n", label: "Nº clientes", type: "number" }, { key: "pct", label: "%", type: "number" }];
+
+      const blanks = {
+        kpis: { eyebrow: "", value: "", sub: "", accent: "navy", artsoft: false },
+        arc2026: { lb: "", sub: "", ating: 0, tone: "exp" },
+        sintese: { lead: "", text: "" },
+        camp: { lb: "", camp: "", disc: "", inv: 0, obj: 0, vnd: 0, ating: 0, exp: false, hero: false },
+        funnel: { lbl: "", val: "", sub: "", cor: "navy" },
+        online: { lb: "", custo: 0, vsess: 0, sess: 0, exp: false, hero: false },
+        loja: { lb: "", custo: 0, vent: 0, ent: 0, fiavel: true, exp: false, hero: false },
+        plataforma: { nome: "", val: 0, pct: 0, cor: "#172033" },
+        art: { lb: "", novos: 0, recor: 0, ticket: 0, vNovos: 0, vRecor: 0, alto: 0, medio: 0, baixo: 0, ab900: 0 },
+        recencia: { faixa: "", n: 0, pct: 0 },
+      };
+
+      return (
+        <div>
+          <div className="toolbar">
+            <span className="brand">Laskasas</span>
+            <span className="title">Estúdio de relatório</span>
+            <div className="modeseg" style={{ marginLeft: 14 }}>
+              <button className={mode === "form" ? "on" : ""} onClick={() => setMode("form")}>Formulário</button>
+              <button className={mode === "json" ? "on" : ""} onClick={() => setMode("json")}>JSON</button>
+            </div>
+            <span className="spacer" />
+            <span className="save-tag">{saved}</span>
+            {mode === "form" ? (
+              <React.Fragment>
+                <button className="btn ghost" onClick={onExportModel}>Exportar dados</button>
+                <button className="btn ghost" onClick={() => importRef.current && importRef.current.click()}>Importar dados</button>
+                <button className="btn ghost" onClick={onFormToJson}>Abrir no modo JSON →</button>
+                <button className="btn danger" onClick={onResetModel}>Repor</button>
+                <input ref={importRef} type="file" accept="application/json,.json" style={{ display: "none" }} onChange={onImportModel} />
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <button className="btn ghost" onClick={onCopyPrompt}>Instruções p/ Claude</button>
+                <button className="btn ghost" onClick={() => importRef.current && importRef.current.click()}>Importar JSON</button>
+                <button className="btn ghost" onClick={onExportJson}>Exportar JSON</button>
+                <button className="btn ghost" onClick={onFormat}>Formatar</button>
+                <button className="btn danger" onClick={onResetJson}>Repor</button>
+                <input ref={importRef} type="file" accept="application/json,.json" style={{ display: "none" }} onChange={onImportJson} />
+              </React.Fragment>
+            )}
+            <button className="btn primary" onClick={onExportHtml}>⬇ Exportar index.html</button>
+          </div>
+
+          <div className="layout">
+            <div className="panel-edit">
+              {mode === "form" ? (
+                <React.Fragment>
+                  <div className="hint">Preenche os campos e vê o relatório à direita. Guardado automaticamente. Usa <code>**asteriscos**</code> para <b>negrito</b> nos textos. Precisas de abas à medida (menos abas, ou abas novas)? Carrega em <b>“Abrir no modo JSON”</b>.</div>
+
+                  <Section eyebrow="Cabeçalho" title="Cabeçalho e introdução" open={true}>
+                    <Field label="Marca / linha superior" value={model.meta.brand} onChange={(v) => setMeta("brand", v)} />
+                    <Field label="Título" value={model.meta.title} onChange={(v) => setMeta("title", v)} />
+                    <Field label="Introdução" area={4} value={model.meta.intro} onChange={(v) => setMeta("intro", v)} />
+                  </Section>
+                  <Section eyebrow="Veredicto" title="Cartões-chave (KPIs)"><TableEditor columns={kpiCols} rows={model.kpis} onChange={(r) => setList("kpis", r)} blank={blanks.kpis} /></Section>
+                  <Section eyebrow="Veredicto" title="Gráfico de cumprimento"><TableEditor columns={arcCols} rows={model.arc2026} onChange={(r) => setList("arc2026", r)} blank={blanks.arc2026} /></Section>
+                  <Section eyebrow="Veredicto" title="Síntese"><TableEditor columns={sinteseCols} rows={model.sintese} onChange={(r) => setList("sintese", r)} blank={blanks.sintese} /></Section>
+                  <Section eyebrow="Resultado" title="Campanhas de verão">
+                    <TableEditor columns={campCols} rows={model.camp} onChange={(r) => setList("camp", r)} blank={blanks.camp} />
+                    <Field label="Nota do gráfico" area={4} value={model.resultadoNote} onChange={(v) => set("resultadoNote", v)} />
+                    <Field label="Nota do quadro" area={3} value={model.campTableNote} onChange={(v) => set("campTableNote", v)} />
+                  </Section>
+                  <Section eyebrow="Funil" title="Etapas do funil"><TableEditor columns={funnelCols} rows={model.funnel} onChange={(r) => setList("funnel", r)} blank={blanks.funnel} /></Section>
+                  <Section eyebrow="Funil" title="Caixa de contexto">
+                    <Field label="Título" value={model.fatorTitle} onChange={(v) => set("fatorTitle", v)} />
+                    <Field label="Texto" area={6} value={model.fatorText} onChange={(v) => set("fatorText", v)} />
+                  </Section>
+                  <Section eyebrow="Funil" title="Eficiência online">
+                    <TableEditor columns={onlineCols} rows={model.online} onChange={(r) => setList("online", r)} blank={blanks.online} />
+                    <Field label="Nota (online)" area={4} value={model.onlineNote} onChange={(v) => set("onlineNote", v)} />
+                  </Section>
+                  <Section eyebrow="Funil" title="Eficiência em loja">
+                    <TableEditor columns={lojaCols} rows={model.loja} onChange={(r) => setList("loja", r)} blank={blanks.loja} />
+                    <Field label="Nota (loja)" area={4} value={model.lojaNote} onChange={(v) => set("lojaNote", v)} />
+                  </Section>
+                  <Section eyebrow="Funil" title="Repartição por meio">
+                    <TableEditor columns={platCols} rows={model.plataforma} onChange={(r) => setList("plataforma", r)} blank={blanks.plataforma} />
+                    <Field label="Nota (meios)" area={3} value={model.plataformaNote} onChange={(v) => set("plataformaNote", v)} />
+                  </Section>
+                  <Section eyebrow="Quem comprou" title="Nota sobre a fonte"><Field label="Texto" area={4} value={model.artSourceNote} onChange={(v) => set("artSourceNote", v)} /></Section>
+                  <Section eyebrow="Quem comprou" title="Clientes, ticket e faixas">
+                    <TableEditor columns={artCols} rows={model.art} onChange={(r) => setList("art", r)} blank={blanks.art} />
+                    <Field label="Nota (novos vs recorrentes)" area={4} value={model.artNote} onChange={(v) => set("artNote", v)} />
+                    <Field label="Nota (ticket médio)" area={3} value={model.ticketNote} onChange={(v) => set("ticketNote", v)} />
+                    <Field label="Nota (faixas de valor)" area={3} value={model.faixasNote} onChange={(v) => set("faixasNote", v)} />
+                  </Section>
+                  <Section eyebrow="Quem comprou" title="Recência">
+                    <TableEditor columns={recCols} rows={model.recencia} onChange={(r) => setList("recencia", r)} blank={blanks.recencia} />
+                    <Field label="Nota (recência)" area={5} value={model.recenciaNote} onChange={(v) => set("recenciaNote", v)} />
+                  </Section>
+                  <Section eyebrow="Rodapé" title="Notas de leitura e rodapé">
+                    <Field label="Notas de leitura" area={7} value={model.meta.readingNotes} onChange={(v) => setMeta("readingNotes", v)} />
+                    <Field label="Linha final" value={model.meta.footer} onChange={(v) => setMeta("footer", v)} />
+                  </Section>
+                </React.Fragment>
+              ) : (
+                <div className="json-wrap">
+                  <div className="hint">Cola aqui o JSON (por ex. o que pediste ao Claude) ou edita o atual. O relatório à direita adapta-se: número de abas, blocos e conteúdo vêm todos do JSON. Uma só aba esconde a barra de abas. Usa <b>Instruções p/ Claude</b> para copiar o formato.</div>
+                  <textarea className="json-area" value={jsonText} spellCheck={false} onChange={(e) => setJsonText(e.target.value)} />
+                  <div className={"json-status " + (jsonError ? "err" : "ok")}>{jsonError ? ("⚠ JSON inválido: " + jsonError) : "✓ JSON válido — pré-visualização atualizada"}</div>
+                  <details className="prompt">
+                    <summary>Instruções para gerar o JSON no Claude (copiar)</summary>
+                    <pre>{CLAUDE_PROMPT}</pre>
+                  </details>
+                </div>
+              )}
+            </div>
+
+            <div className="panel-preview"><Preview data={preview} /></div>
+          </div>
+        </div>
+      );
+    }
+
+    (function () {
+      try {
+        const src = document.getElementById("reportSrc").textContent;
+        const compiled = Babel.transform(src, { presets: ["react"] }).code;
+        (0, eval)(compiled);
+      } catch (e) {
+        document.getElementById("boot").innerHTML = '<div class="err">Erro a compilar o relatório: ' + e.message + '</div>';
+        throw e;
+      }
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+      const boot = document.getElementById("boot");
+      if (boot) { boot.style.opacity = "0"; setTimeout(() => boot.remove(), 300); }
+    })();
+  </script>
+</body>
+</html>
