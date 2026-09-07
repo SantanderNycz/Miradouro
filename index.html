@@ -3,83 +3,89 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Miradouro · Estúdio de relatório</title>
+  <title>Miradouro · Report Studio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="shortcut icon" href="./Assets/favicon/favicon.ico" type="image/x-icon">
   <style>
+    :root {
+      --bg: #F6F7F9; --ink: #1C2530; --primary: #1D5B7E; --primary-hover: #1C2530;
+      --accentL: #8FB0C4; --surface: #FFFFFF; --text: #1C2530; --muted: #5B6673;
+      --border: #E6E8EC; --pos: #3E7C63; --neg: #B4432E;
+    }
     * { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; }
-    body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #EEF0F4; color: #172033; -webkit-font-smoothing: antialiased; }
+    body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
     #root { height: 100vh; }
 
-    .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 18px; background: #172033; color: #fff; border-bottom: 1px solid #101828; }
-    .toolbar .brand { font-size: 10.5px; letter-spacing: .11em; text-transform: uppercase; color: #818CF8; font-weight: 700; }
+    .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 18px; background: var(--ink); color: #fff; border-bottom: 1px solid rgba(0,0,0,.25); }
+    .toolbar .brand { font-size: 10.5px; letter-spacing: .11em; text-transform: uppercase; color: var(--accentL); font-weight: 700; }
     .toolbar .title { font-family: 'Fraunces', serif; font-size: 16px; }
     .toolbar .spacer { margin-left: auto; }
-    .save-tag { font-size: 11px; color: #818CF8; opacity: .85; }
+    .save-tag { font-size: 11px; color: var(--accentL); opacity: .85; }
 
-    .btn { border: none; cursor: pointer; padding: 8px 13px; border-radius: 8px; font-size: 12.3px; font-weight: 600; font-family: Inter, sans-serif; background: #2E3650; color: #fff; transition: background .15s ease; }
-    .btn:hover { background: #3B4560; }
-    .btn.primary { background: #4F46E5; color: #FFFFFF; }
-    .btn.primary:hover { background: #4338CA; }
-    .btn.ghost { background: transparent; border: 1px solid #ffffff33; }
-    .btn.ghost:hover { background: #ffffff14; }
-    .btn.danger { background: transparent; border: 1px solid #D92D20; color: #FDA29B; }
-    .btn.danger:hover { background: #D92D2022; }
+    .btn { border: none; cursor: pointer; padding: 8px 13px; border-radius: 8px; font-size: 12.3px; font-weight: 600; font-family: Inter, sans-serif; background: rgba(255,255,255,.10); color: #fff; transition: background .15s ease; }
+    .btn:hover { background: rgba(255,255,255,.18); }
+    .btn.primary { background: var(--primary); color: #FFFFFF; }
+    .btn.primary:hover { background: var(--primary-hover); }
+    .btn.ghost { background: transparent; border: 1px solid rgba(255,255,255,.22); }
+    .btn.ghost:hover { background: rgba(255,255,255,.10); }
+    .btn.danger { background: transparent; border: 1px solid var(--neg); color: #fff; }
+    .btn.danger:hover { background: var(--neg); }
 
-    .modeseg { display: inline-flex; background: #101828; border-radius: 999px; padding: 3px; gap: 2px; }
-    .modeseg button { border: none; cursor: pointer; padding: 6px 15px; border-radius: 999px; font-size: 12px; font-weight: 600; font-family: Inter, sans-serif; background: transparent; color: #98A2B3; }
-    .modeseg button.on { background: #4F46E5; color: #FFFFFF; }
+    .modeseg { display: inline-flex; background: rgba(0,0,0,.25); border-radius: 999px; padding: 3px; gap: 2px; }
+    .modeseg button { border: none; cursor: pointer; padding: 6px 15px; border-radius: 999px; font-size: 12px; font-weight: 600; font-family: Inter, sans-serif; background: transparent; color: rgba(255,255,255,.7); }
+    .modeseg button.on { background: var(--primary); color: #FFFFFF; }
 
     .layout { display: flex; height: calc(100vh - 50px); }
-    .panel-edit { width: 46%; min-width: 380px; max-width: 660px; overflow-y: auto; background: #F7F8FA; border-right: 1px solid #E4E7EC; padding: 18px 20px 90px; }
-    .panel-preview { flex: 1; overflow-y: auto; background: #F7F8FA; }
+    .panel-edit { width: 46%; min-width: 380px; max-width: 660px; overflow-y: auto; background: var(--bg); border-right: 1px solid var(--border); padding: 18px 20px 90px; }
+    .panel-preview { flex: 1; overflow-y: auto; background: var(--bg); }
 
-    .hint { background: rgba(79,70,229,.06); border: 1px solid rgba(79,70,229,.24); border-radius: 10px; padding: 11px 14px; font-size: 12px; line-height: 1.55; color: #3F3A7A; margin-bottom: 16px; }
-    .hint code { background: #00000010; padding: 1px 5px; border-radius: 4px; font-size: 11.5px; }
+    .hint { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--primary); border-radius: 10px; padding: 11px 14px; font-size: 12px; line-height: 1.55; color: var(--muted); margin-bottom: 16px; }
+    .hint code { background: rgba(0,0,0,.06); padding: 1px 5px; border-radius: 4px; font-size: 11.5px; }
 
-    details.section { background: #fff; border: 1px solid #E4E7EC; border-radius: 12px; margin-bottom: 14px; overflow: hidden; }
-    details.section > summary { cursor: pointer; list-style: none; padding: 13px 16px; font-weight: 600; font-size: 13.5px; color: #172033; display: flex; align-items: center; gap: 8px; user-select: none; }
+    details.section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 14px; overflow: hidden; }
+    details.section > summary { cursor: pointer; list-style: none; padding: 13px 16px; font-weight: 600; font-size: 13.5px; color: var(--ink); display: flex; align-items: center; gap: 8px; user-select: none; }
     details.section > summary::-webkit-details-marker { display: none; }
-    details.section > summary .chev { transition: transform .15s ease; color: #4F46E5; font-size: 12px; }
+    details.section > summary .chev { transition: transform .15s ease; color: var(--primary); font-size: 12px; }
     details.section[open] > summary .chev { transform: rotate(90deg); }
-    details.section > summary .eyebrow { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #4F46E5; font-weight: 700; }
+    details.section > summary .eyebrow { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--primary); font-weight: 700; }
     .section-body { padding: 4px 16px 16px; }
 
     .field { margin-bottom: 12px; }
-    .field > label { display: block; font-size: 11px; font-weight: 600; color: #667085; margin-bottom: 4px; }
-    .field input[type=text], .field input[type=number], .field textarea, .field select { width: 100%; border: 1px solid #D0D5DD; border-radius: 7px; padding: 7px 9px; font-size: 12.5px; font-family: Inter, sans-serif; color: #172033; background: #FFFFFF; }
+    .field > label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+    .field input[type=text], .field input[type=number], .field textarea, .field select { width: 100%; border: 1px solid var(--border); border-radius: 7px; padding: 7px 9px; font-size: 12.5px; font-family: Inter, sans-serif; color: var(--text); background: var(--surface); }
     .field textarea { resize: vertical; min-height: 60px; line-height: 1.5; }
-    .field input:focus, .field textarea:focus, .field select:focus { outline: 2px solid #4F46E555; border-color: #4F46E5; }
+    .field input:focus, .field textarea:focus, .field select:focus { outline: 2px solid var(--primary); outline-offset: 0; border-color: var(--primary); }
 
     .tbl-wrap { overflow-x: auto; margin-bottom: 8px; }
     table.editor-tbl { border-collapse: collapse; width: 100%; font-size: 11.5px; }
-    table.editor-tbl th { text-align: left; font-weight: 600; color: #667085; padding: 4px 5px; font-size: 10px; text-transform: uppercase; letter-spacing: .03em; white-space: nowrap; }
+    table.editor-tbl th { text-align: left; font-weight: 600; color: var(--muted); padding: 4px 5px; font-size: 10px; text-transform: uppercase; letter-spacing: .03em; white-space: nowrap; }
     table.editor-tbl td { padding: 2px 4px; vertical-align: top; }
-    table.editor-tbl input, table.editor-tbl select { border: 1px solid #D0D5DD; border-radius: 5px; padding: 5px 6px; font-size: 11.5px; font-family: Inter, sans-serif; background: #FFFFFF; color: #172033; }
+    table.editor-tbl input, table.editor-tbl select { border: 1px solid var(--border); border-radius: 5px; padding: 5px 6px; font-size: 11.5px; font-family: Inter, sans-serif; background: var(--surface); color: var(--text); }
     table.editor-tbl input[type=text] { min-width: 90px; }
     table.editor-tbl input[type=number] { width: 78px; }
-    .row-del { border: none; background: #D92D2015; color: #D92D20; cursor: pointer; border-radius: 5px; padding: 5px 8px; font-weight: 700; font-size: 12px; }
-    .row-del:hover { background: #D92D2030; }
-    .add-row { border: 1px dashed #4F46E5; background: #4F46E510; color: #4338CA; cursor: pointer; border-radius: 7px; padding: 6px 12px; font-size: 11.5px; font-weight: 600; }
-    .add-row:hover { background: #4F46E520; }
+    .row-del { border: none; background: rgba(0,0,0,.04); color: var(--neg); cursor: pointer; border-radius: 5px; padding: 5px 8px; font-weight: 700; font-size: 12px; }
+    .row-del:hover { background: rgba(0,0,0,.08); }
+    .add-row { border: 1px dashed var(--primary); background: transparent; color: var(--primary); cursor: pointer; border-radius: 7px; padding: 6px 12px; font-size: 11.5px; font-weight: 600; }
+    .add-row:hover { background: var(--surface); }
 
     /* modo JSON */
     .json-wrap { display: flex; flex-direction: column; height: 100%; }
-    .json-area { flex: 1; width: 100%; border: 1px solid #D0D5DD; border-radius: 10px; padding: 12px 13px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; line-height: 1.5; color: #172033; background: #FFFFFF; resize: none; min-height: 320px; }
-    .json-area:focus { outline: 2px solid #4F46E555; border-color: #4F46E5; }
+    .json-area { flex: 1; width: 100%; border: 1px solid var(--border); border-radius: 10px; padding: 12px 13px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; line-height: 1.5; color: var(--text); background: var(--surface); resize: none; min-height: 320px; }
+    .json-area:focus { outline: 2px solid var(--primary); border-color: var(--primary); }
     .json-status { font-size: 11.5px; margin: 8px 2px 0; }
-    .json-status.ok { color: #12B76A; }
-    .json-status.err { color: #D92D20; }
-    details.prompt { margin-top: 12px; background: #fff; border: 1px solid #E4E7EC; border-radius: 10px; }
-    details.prompt > summary { cursor: pointer; padding: 11px 14px; font-weight: 600; font-size: 12.5px; color: #172033; }
-    details.prompt pre { margin: 0; padding: 12px 14px; border-top: 1px solid #E4E7EC; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11px; line-height: 1.5; white-space: pre-wrap; color: #475467; max-height: 340px; overflow: auto; }
+    .json-status.ok { color: var(--pos); }
+    .json-status.err { color: var(--neg); }
+    details.prompt { margin-top: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+    details.prompt > summary { cursor: pointer; padding: 11px 14px; font-weight: 600; font-size: 12.5px; color: var(--ink); }
+    details.prompt pre { margin: 0; padding: 12px 14px; border-top: 1px solid var(--border); font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11px; line-height: 1.5; white-space: pre-wrap; color: var(--muted); max-height: 340px; overflow: auto; }
 
-    #boot { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; background: #EEF0F4; color: #667085; font-size: 13.5px; z-index: 50; }
-    #boot .spin { width: 26px; height: 26px; border-radius: 50%; border: 2.5px solid #E4E7EC; border-top-color: #4F46E5; animation: spin .8s linear infinite; }
+    #boot { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; background: var(--bg); color: var(--muted); font-size: 13.5px; z-index: 50; }
+    #boot .spin { width: 26px; height: 26px; border-radius: 50%; border: 2.5px solid var(--border); border-top-color: var(--primary); animation: spin .8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    #boot .err { max-width: 460px; text-align: center; line-height: 1.6; color: #D92D20; padding: 0 20px; }
+    #boot .err { max-width: 460px; text-align: center; line-height: 1.6; color: var(--neg); padding: 0 20px; }
 
     @media (max-width: 860px) {
       .layout { flex-direction: column; height: auto; }
@@ -118,8 +124,17 @@
     const { useState } = React;
     const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell, ReferenceLine } = Recharts;
 
-    const C = { bg: "#F7F8FA", surface: "#FFFFFF", navy: "#172033", navyLight: "#4F46E5", gold: "#4F46E5", goldLight: "#818CF8", slate: "#98A2B3", terracotta: "#D92D20", sage: "#12B76A", text: "#172033", muted: "#667085", border: "#E4E7EC" };
-    const PAL = { navy: C.navy, navyLight: C.navyLight, sage: C.sage, terracotta: C.terracotta, gold: C.gold, goldLight: C.goldLight, slate: C.slate };
+    const THEMES = {
+      A: { name: "Grafite & Aço", bg: "#F6F7F9", surface: "#FFFFFF", navy: "#1C2530", navyLight: "#1D5B7E", gold: "#1D5B7E", goldLight: "#8FB0C4", slate: "#8A94A2", terracotta: "#B4432E", sage: "#3E7C63", text: "#1C2530", muted: "#5B6673", border: "#E6E8EC" },
+      B: { name: "Ardósia & Âmbar", bg: "#F7F5F0", surface: "#FFFFFF", navy: "#20242B", navyLight: "#9A6B2A", gold: "#A9762F", goldLight: "#C99A5B", slate: "#8C8A85", terracotta: "#A6462F", sage: "#5E7A57", text: "#20242B", muted: "#6A6A66", border: "#E7E3DA" },
+      C: { name: "Petróleo", bg: "#F5F7F7", surface: "#FFFFFF", navy: "#16232B", navyLight: "#1E6E6A", gold: "#1E6E6A", goldLight: "#77ABA8", slate: "#8A9699", terracotta: "#C05640", sage: "#3F7D5E", text: "#16232B", muted: "#5A6A6E", border: "#E3E8E8" },
+    };
+    let C = THEMES.A;
+    let PAL = { navy: C.navy, navyLight: C.navyLight, sage: C.sage, terracotta: C.terracotta, gold: C.gold, goldLight: C.goldLight, slate: C.slate };
+    function applyTheme(name) {
+      C = THEMES[name] || THEMES.A;
+      PAL = { navy: C.navy, navyLight: C.navyLight, sage: C.sage, terracotta: C.terracotta, gold: C.gold, goldLight: C.goldLight, slate: C.slate };
+    }
     const col = (k) => (k == null ? C.navy : (PAL[k] || (String(k).charAt(0) === "#" ? k : C.navy)));
     const eur = (v) => new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(Number(v) || 0);
     const num = (v) => (v == null || v === "" ? 0 : Number(v));
@@ -173,7 +188,7 @@
 
     function Seg({ value, onChange, options }) {
       return (
-        <div style={{ display: "inline-flex", background: "#EEF0F4", borderRadius: 999, padding: 3, gap: 2 }}>
+        <div style={{ display: "inline-flex", background: C.border, borderRadius: 999, padding: 3, gap: 2 }}>
           {options.map((o) => (
             <button key={o.value} onClick={() => onChange(o.value)}
               style={{ border: "none", cursor: "pointer", padding: "6px 14px", borderRadius: 999, fontSize: 12, fontWeight: 600, fontFamily: "Inter, sans-serif", background: value === o.value ? C.navy : "transparent", color: value === o.value ? "#fff" : C.muted }}>
@@ -247,7 +262,7 @@
                 <span style={{ fontWeight: 600, color: C.navy }}>{p.label}</span>
                 <span style={{ color: C.muted }}>{p.valueLabel}</span>
               </div>
-              <div style={{ height: 12, background: "#EEF0F4", borderRadius: 6, overflow: "hidden" }}>
+              <div style={{ height: 12, background: C.border, borderRadius: 6, overflow: "hidden" }}>
                 <div style={{ width: `${p.pct}%`, height: "100%", background: col(p.color), borderRadius: 6 }} />
               </div>
             </div>
@@ -303,7 +318,7 @@
         if (active.tooltip && active.tooltip.extraKey) return [out, p && p.payload ? p.payload[active.tooltip.extraKey] : ""];
         return [out, name];
       };
-      const labelStyle = active.barLabelStyle || { fontSize: 10.5, fill: C.muted };
+      const labelStyle = active.barLabelStyle ? Object.assign({}, active.barLabelStyle, { fill: col(active.barLabelStyle.fill) }) : { fontSize: 10.5, fill: C.muted };
       return (
         <div>
           {(active.subtitle || spec.variants) && (
@@ -390,6 +405,7 @@
     function ReportApp({ data }) {
       const D = data || {};
       const meta = D.meta || {};
+      applyTheme(meta.theme);
       let tabs = D.tabs;
       if (!tabs || !tabs.length) tabs = [{ label: "", blocks: D.blocks || [] }];
       const [tab, setTab] = useState(0);
@@ -428,6 +444,7 @@
     }
 
     window.ReportApp = ReportApp;
+    window.__THEMES = THEMES;
   </script>
 
   <!-- ============ ESTÚDIO (formulários + modo JSON) ============ -->
@@ -438,6 +455,7 @@
     // ---------------- MODELO AMIGÁVEL (usado pelos formulários) ----------------
     const DEFAULT_MODEL = {
       meta: {
+        theme: "A",
         brand: "Laskasas Portugal · Relatório de campanha",
         title: "Dias Quentes — Agosto 2026",
         intro: "Análise de resultados da campanha de verão. Este ano a campanha de saldos foi feita em maio e junho e voltou a acontecer em agosto, como nos anos anteriores. Maio e junho tiveram condicionantes próprias, que se assinalam adiante. Este relatório analisa a campanha de agosto no seu contexto.",
@@ -497,9 +515,9 @@
       ],
       lojaNote: "**Encheu as lojas, mas a loja não converteu tão bem.** Agosto trouxe visitantes à loja ao custo mais baixo (5,35 € por entrada) e em muito maior número (8.587). Mas cada visita rendeu apenas 226 €, abaixo dos 279 € de maio e 277 € de junho. É o ponto do mês com mais margem para melhorar.",
       plataforma: [
-        { nome: "Facebook e Instagram", val: 32518, pct: 71, cor: "#172033" },
-        { nome: "Google", val: 12010, pct: 26, cor: "#4F46E5" },
-        { nome: "Rede de websites", val: 1379, pct: 3, cor: "#98A2B3" },
+        { nome: "Facebook e Instagram", val: 32518, pct: 71, cor: "navy" },
+        { nome: "Google", val: 12010, pct: 26, cor: "navyLight" },
+        { nome: "Rede de websites", val: 1379, pct: 3, cor: "slate" },
       ],
       plataformaNote: "O grosso do investimento foi para Facebook e Instagram, seguido do Google. A rede de websites teve um papel de reforço de exposição no arranque.",
       artSourceNote: "**Nota sobre a fonte.** Os dados desta secção vêm do Artsoft, o CRM atual, que tem falhas conhecidas. Os totais não coincidem com o ficheiro oficial de vendas, pelo que servem para ler tendências e composição, não valores absolutos.",
@@ -544,7 +562,7 @@
             blocks: [
               { type: "kpis", items: m.kpis.map((k) => ({ eyebrow: k.eyebrow, value: k.value, sub: k.sub, accent: k.accent, footnote: k.artsoft ? "fonte: Artsoft (aprox.)" : null })) },
               { type: "card", eyebrow: "Saldos do ano", title: "Cumprimento do objetivo por campanha", subtitle: "Percentagem do objetivo comercial atingida pelas campanhas de desconto profundo. A linha marca os 100%.", blocks: [
-                { type: "barChart", data: arc, xKey: "lb", height: 330, yFormat: "percent", yDomain: [0, 120], referenceLine: { y: 100, label: "objetivo" }, barLabelFormat: "percent", barLabelStyle: { fontSize: 14, fill: "#172033", fontWeight: 700 }, series: [{ key: "ating", colorKey: "color" }], tooltip: { valueFormat: "percent", extraKey: "sub" }, legendItems: [{ color: "terracotta", label: "Abaixo do objetivo" }, { color: "sage", label: "Campanha em destaque" }] },
+                { type: "barChart", data: arc, xKey: "lb", height: 330, yFormat: "percent", yDomain: [0, 120], referenceLine: { y: 100, label: "objetivo" }, barLabelFormat: "percent", barLabelStyle: { fontSize: 14, fill: "navy", fontWeight: 700 }, series: [{ key: "ating", colorKey: "color" }], tooltip: { valueFormat: "percent", extraKey: "sub" }, legendItems: [{ color: "terracotta", label: "Abaixo do objetivo" }, { color: "sage", label: "Campanha em destaque" }] },
               ] },
               { type: "synthesis", title: "Síntese", items: m.sintese },
             ],
@@ -640,7 +658,8 @@
       "Preciso que geres um ficheiro JSON para o meu relatório interativo. Devolve APENAS JSON válido, sem comentários.",
       "",
       "Estrutura de topo:",
-      '{ "meta": { "brand", "title", "intro", "footer", "readingNotes" }, "tabs": [ { "label": "Nome da aba", "blocks": [ ...blocos ] } ] }',
+      '{ "meta": { "theme", "brand", "title", "intro", "footer", "readingNotes" }, "tabs": [ { "label": "Nome da aba", "blocks": [ ...blocos ] } ] }',
+      '- meta.theme escolhe a paleta: "A" (Grafite & Aço), "B" (Ardósia & Âmbar) ou "C" (Petróleo). Por defeito "A".',
       "- tabs é uma lista. Podes ter 1 aba (a barra de abas fica escondida) ou várias.",
       "- Em qualquer texto, envolve uma expressão em **duplo asterisco** para a pôr a negrito.",
       "- Cores aceitam um nome (navy, navyLight, sage, terracotta, gold, goldLight, slate) ou um hex tipo \"#4F46E5\".",
@@ -687,6 +706,7 @@
         "    root.render(React.createElement(window.ReportApp, { data: DATA }));\n" +
         "    const boot = document.getElementById('boot'); if (boot) { boot.style.opacity='0'; setTimeout(function(){boot.remove();}, 300); }\n  " + E;
       const title = (reportObj.meta && reportObj.meta.title) ? reportObj.meta.title : "Relatório";
+      const TH = (window.__THEMES && window.__THEMES[(reportObj.meta && reportObj.meta.theme) || "A"]) || (window.__THEMES && window.__THEMES.A) || { bg: "#F6F7F9", muted: "#5B6673", border: "#E6E8EC", navyLight: "#1D5B7E" };
       return [
         "<!DOCTYPE html>", '<html lang="pt-PT">', "<head>",
         '  <meta charset="UTF-8" />', '  <meta name="viewport" content="width=device-width, initial-scale=1.0" />',
@@ -695,10 +715,10 @@
         '  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />',
         "  <style>",
         "    * { box-sizing: border-box; } html, body { margin: 0; padding: 0; }",
-        '    body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #F7F8FA; -webkit-font-smoothing: antialiased; }',
+        '    body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: ' + TH.bg + '; -webkit-font-smoothing: antialiased; }',
         "    #root { min-height: 100vh; }",
-        "    #boot { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; background: #F7F8FA; color: #667085; font-size: 13.5px; transition: opacity .3s ease; }",
-        "    #boot .spin { width: 26px; height: 26px; border-radius: 50%; border: 2.5px solid #E4E7EC; border-top-color: #4F46E5; animation: spin .8s linear infinite; }",
+        "    #boot { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; background: " + TH.bg + "; color: " + TH.muted + "; font-size: 13.5px; transition: opacity .3s ease; }",
+        "    #boot .spin { width: 26px; height: 26px; border-radius: 50%; border: 2.5px solid " + TH.border + "; border-top-color: " + TH.navyLight + "; animation: spin .8s linear infinite; }",
         "    @keyframes spin { to { transform: rotate(360deg); } }",
         "  </style>", "</head>", "<body>",
         '  <div id="boot"><div class="spin"></div><div>A carregar o relatório…</div></div>',
@@ -816,6 +836,17 @@
 
       useEffect(() => { try { localStorage.setItem(STORE_MODE, mode); } catch (e) {} }, [mode]);
 
+      // retematiza a interface do estúdio consoante o tema do relatório
+      useEffect(() => {
+        const themes = window.__THEMES || {};
+        const T = themes[(preview && preview.meta && preview.meta.theme) || "A"] || themes.A;
+        if (!T) return;
+        const r = document.documentElement, s = (k, v) => r.style.setProperty(k, v);
+        s("--bg", T.bg); s("--ink", T.navy); s("--primary", T.navyLight); s("--primary-hover", T.navy);
+        s("--accentL", T.goldLight); s("--surface", T.surface); s("--text", T.text); s("--muted", T.muted);
+        s("--border", T.border); s("--pos", T.sage); s("--neg", T.terracotta);
+      }, [preview]);
+
       const set = (key, val) => setModel((d) => Object.assign({}, d, { [key]: val }));
       const setMeta = (key, val) => setModel((d) => Object.assign({}, d, { meta: Object.assign({}, d.meta, { [key]: val }) }));
       const setList = (key, rows) => setModel((d) => Object.assign({}, d, { [key]: rows }));
@@ -841,7 +872,7 @@
       const funnelCols = [{ key: "lbl", label: "Etapa", type: "text" }, { key: "val", label: "Valor", type: "text" }, { key: "sub", label: "Descrição", type: "text" }, { key: "cor", label: "Cor", type: "select", options: ACCENTS }];
       const onlineCols = [{ key: "lb", label: "Mês", type: "text" }, { key: "custo", label: "Custo/visita", type: "number", step: "0.001" }, { key: "vsess", label: "Vendas/visita", type: "number", step: "0.01" }, { key: "sess", label: "Sessões", type: "number" }, { key: "exp", label: "Abaixo?", type: "checkbox" }, { key: "hero", label: "Destaque?", type: "checkbox" }];
       const lojaCols = [{ key: "lb", label: "Mês", type: "text" }, { key: "custo", label: "Custo/visita", type: "number", step: "0.01" }, { key: "vent", label: "Vendas/entrada", type: "number" }, { key: "ent", label: "Entradas", type: "number" }, { key: "fiavel", label: "Fiável?", type: "checkbox" }, { key: "exp", label: "Abaixo?", type: "checkbox" }, { key: "hero", label: "Destaque?", type: "checkbox" }];
-      const platCols = [{ key: "nome", label: "Meio", type: "text" }, { key: "val", label: "Valor €", type: "number" }, { key: "pct", label: "%", type: "number" }, { key: "cor", label: "Cor", type: "color" }];
+      const platCols = [{ key: "nome", label: "Meio", type: "text" }, { key: "val", label: "Valor €", type: "number" }, { key: "pct", label: "%", type: "number" }, { key: "cor", label: "Cor", type: "select", options: ACCENTS }];
       const artCols = [{ key: "lb", label: "Mês", type: "text" }, { key: "novos", label: "Novos", type: "number" }, { key: "recor", label: "Recor.", type: "number" }, { key: "ticket", label: "Ticket €", type: "number" }, { key: "vNovos", label: "Valor novos", type: "number" }, { key: "vRecor", label: "Valor recor.", type: "number" }, { key: "alto", label: "% Alto", type: "number", step: "0.1" }, { key: "medio", label: "% Médio", type: "number", step: "0.1" }, { key: "baixo", label: "% Baixo", type: "number", step: "0.1" }, { key: "ab900", label: "% <900", type: "number", step: "0.1" }];
       const recCols = [{ key: "faixa", label: "Faixa", type: "text" }, { key: "n", label: "Nº clientes", type: "number" }, { key: "pct", label: "%", type: "number" }];
 
@@ -853,7 +884,7 @@
         funnel: { lbl: "", val: "", sub: "", cor: "navy" },
         online: { lb: "", custo: 0, vsess: 0, sess: 0, exp: false, hero: false },
         loja: { lb: "", custo: 0, vent: 0, ent: 0, fiavel: true, exp: false, hero: false },
-        plataforma: { nome: "", val: 0, pct: 0, cor: "#172033" },
+        plataforma: { nome: "", val: 0, pct: 0, cor: "navy" },
         art: { lb: "", novos: 0, recor: 0, ticket: 0, vNovos: 0, vRecor: 0, alto: 0, medio: 0, baixo: 0, ab900: 0 },
         recencia: { faixa: "", n: 0, pct: 0 },
       };
@@ -862,7 +893,10 @@
         <div>
           <div className="toolbar">
             <span className="brand">Miradouro</span>
-            <span className="title">Estúdio de relatório</span>
+            <a href="#inicio" class="nav-logo">
+      <img src="./assets/logo.png" alt="Logo - Miradouro" />
+    </a>
+            <span className="title">Report Studio</span>
             <div className="modeseg" style={{ marginLeft: 14 }}>
               <button className={mode === "form" ? "on" : ""} onClick={() => setMode("form")}>Formulário</button>
               <button className={mode === "json" ? "on" : ""} onClick={() => setMode("json")}>JSON</button>
@@ -897,6 +931,14 @@
                   <div className="hint">Preenche os campos e vê o relatório à direita. Guardado automaticamente. Usa <code>**asteriscos**</code> para <b>negrito</b> nos textos. Precisas de abas à medida (menos abas, ou abas novas)? Carrega em <b>“Abrir no modo JSON”</b>.</div>
 
                   <Section eyebrow="Cabeçalho" title="Cabeçalho e introdução" open={true}>
+                    <div className="field">
+                      <label>Tema (paleta)</label>
+                      <select value={model.meta.theme || "A"} onChange={(e) => setMeta("theme", e.target.value)}>
+                        <option value="A">A · Grafite &amp; Aço</option>
+                        <option value="B">B · Ardósia &amp; Âmbar</option>
+                        <option value="C">C · Petróleo</option>
+                      </select>
+                    </div>
                     <Field label="Marca / linha superior" value={model.meta.brand} onChange={(v) => setMeta("brand", v)} />
                     <Field label="Título" value={model.meta.title} onChange={(v) => setMeta("title", v)} />
                     <Field label="Introdução" area={4} value={model.meta.intro} onChange={(v) => setMeta("intro", v)} />
