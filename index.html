@@ -6,7 +6,7 @@
   <title>Miradouro · Report Studio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="shortcut icon" href="./Assets/favicon/favicon.ico" type="image/x-icon">
   <style>
     :root {
@@ -16,16 +16,16 @@
     }
     * { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; }
-    body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+    body { font-family: Poppins, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
     #root { height: 100vh; }
 
     .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 18px; background: var(--ink); color: #fff; border-bottom: 1px solid rgba(0,0,0,.25); }
     .toolbar .brand { font-size: 10.5px; letter-spacing: .11em; text-transform: uppercase; color: var(--accentL); font-weight: 700; }
-    .toolbar .title { font-family: 'Fraunces', serif; font-size: 16px; }
+    .toolbar .title { font-family: 'Lora', serif; font-size: 16px; }
     .toolbar .spacer { margin-left: auto; }
     .save-tag { font-size: 11px; color: var(--accentL); opacity: .85; }
 
-    .btn { border: none; cursor: pointer; padding: 8px 13px; border-radius: 8px; font-size: 12.3px; font-weight: 600; font-family: Inter, sans-serif; background: rgba(255,255,255,.10); color: #fff; transition: background .15s ease; }
+    .btn { border: none; cursor: pointer; padding: 8px 13px; border-radius: 8px; font-size: 12.3px; font-weight: 600; font-family: Poppins, sans-serif; background: rgba(255,255,255,.10); color: #fff; transition: background .15s ease; }
     .btn:hover { background: rgba(255,255,255,.18); }
     .btn.primary { background: var(--primary); color: #FFFFFF; }
     .btn.primary:hover { background: var(--primary-hover); }
@@ -35,7 +35,7 @@
     .btn.danger:hover { background: var(--neg); }
 
     .modeseg { display: inline-flex; background: rgba(0,0,0,.25); border-radius: 999px; padding: 3px; gap: 2px; }
-    .modeseg button { border: none; cursor: pointer; padding: 6px 15px; border-radius: 999px; font-size: 12px; font-weight: 600; font-family: Inter, sans-serif; background: transparent; color: rgba(255,255,255,.7); }
+    .modeseg button { border: none; cursor: pointer; padding: 6px 15px; border-radius: 999px; font-size: 12px; font-weight: 600; font-family: Poppins, sans-serif; background: transparent; color: rgba(255,255,255,.7); }
     .modeseg button.on { background: var(--primary); color: #FFFFFF; }
 
     .layout { display: flex; height: calc(100vh - 50px); }
@@ -55,7 +55,7 @@
 
     .field { margin-bottom: 12px; }
     .field > label { display: block; font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
-    .field input[type=text], .field input[type=number], .field textarea, .field select { width: 100%; border: 1px solid var(--border); border-radius: 7px; padding: 7px 9px; font-size: 12.5px; font-family: Inter, sans-serif; color: var(--text); background: var(--surface); }
+    .field input[type=text], .field input[type=number], .field textarea, .field select { width: 100%; border: 1px solid var(--border); border-radius: 7px; padding: 7px 9px; font-size: 12.5px; font-family: Poppins, sans-serif; color: var(--text); background: var(--surface); }
     .field textarea { resize: vertical; min-height: 60px; line-height: 1.5; }
     .field input:focus, .field textarea:focus, .field select:focus { outline: 2px solid var(--primary); outline-offset: 0; border-color: var(--primary); }
 
@@ -63,7 +63,7 @@
     table.editor-tbl { border-collapse: collapse; width: 100%; font-size: 11.5px; }
     table.editor-tbl th { text-align: left; font-weight: 600; color: var(--muted); padding: 4px 5px; font-size: 10px; text-transform: uppercase; letter-spacing: .03em; white-space: nowrap; }
     table.editor-tbl td { padding: 2px 4px; vertical-align: top; }
-    table.editor-tbl input, table.editor-tbl select { border: 1px solid var(--border); border-radius: 5px; padding: 5px 6px; font-size: 11.5px; font-family: Inter, sans-serif; background: var(--surface); color: var(--text); }
+    table.editor-tbl input, table.editor-tbl select { border: 1px solid var(--border); border-radius: 5px; padding: 5px 6px; font-size: 11.5px; font-family: Poppins, sans-serif; background: var(--surface); color: var(--text); }
     table.editor-tbl input[type=text] { min-width: 90px; }
     table.editor-tbl input[type=number] { width: 78px; }
     .row-del { border: none; background: rgba(0,0,0,.04); color: var(--neg); cursor: pointer; border-radius: 5px; padding: 5px 8px; font-weight: 700; font-size: 12px; }
@@ -173,7 +173,7 @@
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 18 }}>
           <div style={{ flex: "1 1 340px" }}>
             {eyebrow && <div style={{ fontSize: 10.5, letterSpacing: "0.08em", textTransform: "uppercase", color: C.gold, fontWeight: 700, marginBottom: 5 }}>{eyebrow}</div>}
-            {title && <div style={{ fontFamily: "'Fraunces', serif", fontSize: 20, color: C.navy }}>{title}</div>}
+            {title && <div style={{ fontFamily: "'Lora', serif", fontSize: 20, color: C.navy }}>{title}</div>}
             {subtitle && <div style={{ fontSize: 12.5, color: C.muted, marginTop: 5, maxWidth: 720, lineHeight: 1.55 }}>{subtitle}</div>}
           </div>
           {right}
@@ -191,7 +191,7 @@
         <div style={{ display: "inline-flex", background: C.border, borderRadius: 999, padding: 3, gap: 2 }}>
           {options.map((o) => (
             <button key={o.value} onClick={() => onChange(o.value)}
-              style={{ border: "none", cursor: "pointer", padding: "6px 14px", borderRadius: 999, fontSize: 12, fontWeight: 600, fontFamily: "Inter, sans-serif", background: value === o.value ? C.navy : "transparent", color: value === o.value ? "#fff" : C.muted }}>
+              style={{ border: "none", cursor: "pointer", padding: "6px 14px", borderRadius: 999, fontSize: 12, fontWeight: 600, fontFamily: "Poppins, sans-serif", background: value === o.value ? C.navy : "transparent", color: value === o.value ? "#fff" : C.muted }}>
               {o.label}
             </button>
           ))}
@@ -205,7 +205,7 @@
           {(items || []).map((k, i) => (
             <div key={i} style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 14, padding: "18px 20px", flex: "1 1 210px", minWidth: 190 }}>
               <div style={{ fontSize: 10.5, letterSpacing: "0.06em", textTransform: "uppercase", color: C.muted, fontWeight: 700, marginBottom: 8 }}>{k.eyebrow}</div>
-              <div style={{ fontFamily: "'Fraunces', serif", fontSize: 27, color: col(k.accent), lineHeight: 1.1 }}>{k.value}</div>
+              <div style={{ fontFamily: "'Lora', serif", fontSize: 27, color: col(k.accent), lineHeight: 1.1 }}>{k.value}</div>
               {k.sub && <div style={{ fontSize: 12, color: C.muted, marginTop: 6, lineHeight: 1.45 }}>{k.sub}</div>}
               {k.footnote && <div style={{ fontSize: 9.5, color: C.gold, marginTop: 6, fontWeight: 600 }}>{k.footnote}</div>}
             </div>
@@ -245,7 +245,7 @@
           {(steps || []).map((s, i) => (
             <div key={i} style={{ flex: "1 1 180px", minWidth: 160, background: col(s.color), borderRadius: 12, padding: "18px 18px", color: "#fff" }}>
               <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.05em", opacity: 0.75, fontWeight: 700, marginBottom: 8 }}>{i + 1}. {s.label}</div>
-              <div style={{ fontFamily: "'Fraunces', serif", fontSize: 25, lineHeight: 1.05 }}>{s.value}</div>
+              <div style={{ fontFamily: "'Lora', serif", fontSize: 25, lineHeight: 1.05 }}>{s.value}</div>
               {s.sub && <div style={{ fontSize: 11.5, opacity: 0.82, marginTop: 6 }}>{s.sub}</div>}
             </div>
           ))}
@@ -332,7 +332,7 @@
               <CartesianGrid stroke={C.border} vertical={false} />
               <XAxis dataKey={active.xKey || "lb"} tick={{ fontSize: 11.5, fill: C.text }} axisLine={{ stroke: C.border }} tickLine={false} />
               <YAxis domain={active.yDomain || [0, "auto"]} tickFormatter={(v) => fmt(v, active.yFormat)} tick={{ fontSize: 11.5, fill: C.muted }} axisLine={false} tickLine={false} width={active.yWidth || 46} />
-              <Tooltip contentStyle={{ background: C.navy, border: "none", borderRadius: 8, fontSize: 12 }} labelStyle={{ color: C.goldLight, fontFamily: "'Fraunces', serif" }} itemStyle={{ color: "#fff" }} formatter={tip} />
+              <Tooltip contentStyle={{ background: C.navy, border: "none", borderRadius: 8, fontSize: 12 }} labelStyle={{ color: C.goldLight, fontFamily: "'Lora', serif" }} itemStyle={{ color: "#fff" }} formatter={tip} />
               {active.referenceLine && <ReferenceLine y={active.referenceLine.y} stroke={C.navy} strokeDasharray="5 4" label={active.referenceLine.label ? { value: active.referenceLine.label, position: "right", fontSize: 11, fill: C.navy } : undefined} />}
               {active.legend && <Legend wrapperStyle={{ fontSize: 11.5, paddingTop: 10 }} />}
               {series.map((s, si) => {
@@ -413,11 +413,11 @@
       const activeTab = tabs[Math.min(tab, tabs.length - 1)] || tabs[0];
 
       return (
-        <div style={{ background: C.bg, minHeight: "100%", fontFamily: "Inter, sans-serif", color: C.text, padding: "28px 24px 44px" }}>
+        <div style={{ background: C.bg, minHeight: "100%", fontFamily: "Poppins, sans-serif", color: C.text, padding: "28px 24px 44px" }}>
           <div style={{ maxWidth: 1080, margin: "0 auto" }}>
             <div style={{ marginBottom: 22 }}>
               {meta.brand && <div style={{ fontSize: 10.5, letterSpacing: "0.11em", textTransform: "uppercase", color: C.gold, fontWeight: 700, marginBottom: 9 }}>{meta.brand}</div>}
-              {meta.title && <h1 style={{ fontFamily: "'Fraunces', serif", fontSize: 31, color: C.navy, margin: "0 0 9px", lineHeight: 1.2 }}>{meta.title}</h1>}
+              {meta.title && <h1 style={{ fontFamily: "'Lora', serif", fontSize: 31, color: C.navy, margin: "0 0 9px", lineHeight: 1.2 }}>{meta.title}</h1>}
               {meta.intro && <p style={{ color: C.muted, fontSize: 13.5, maxWidth: 720, margin: 0, lineHeight: 1.6 }}>{meta.intro}</p>}
             </div>
 
@@ -425,7 +425,7 @@
               <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 24, borderBottom: `1px solid ${C.border}`, paddingBottom: 13 }}>
                 {tabs.map((t, i) => (
                   <button key={i} onClick={() => setTab(i)}
-                    style={{ border: "none", cursor: "pointer", padding: "8px 16px", borderRadius: 9, fontSize: 12.5, fontWeight: 600, fontFamily: "Inter, sans-serif", background: i === tab ? C.navy : "transparent", color: i === tab ? "#fff" : C.muted }}>
+                    style={{ border: "none", cursor: "pointer", padding: "8px 16px", borderRadius: 9, fontSize: 12.5, fontWeight: 600, fontFamily: "Poppins, sans-serif", background: i === tab ? C.navy : "transparent", color: i === tab ? "#fff" : C.muted }}>
                     {t.label}
                   </button>
                 ))}
@@ -712,10 +712,10 @@
         '  <meta charset="UTF-8" />', '  <meta name="viewport" content="width=device-width, initial-scale=1.0" />',
         "  <title>" + title + "</title>",
         '  <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />',
-        '  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />',
+        '  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet" />',
         "  <style>",
         "    * { box-sizing: border-box; } html, body { margin: 0; padding: 0; }",
-        '    body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: ' + TH.bg + '; -webkit-font-smoothing: antialiased; }',
+        '    body { font-family: Poppins, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: ' + TH.bg + '; -webkit-font-smoothing: antialiased; }',
         "    #root { min-height: 100vh; }",
         "    #boot { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; background: " + TH.bg + "; color: " + TH.muted + "; font-size: 13.5px; transition: opacity .3s ease; }",
         "    #boot .spin { width: 26px; height: 26px; border-radius: 50%; border: 2.5px solid " + TH.border + "; border-top-color: " + TH.navyLight + "; animation: spin .8s linear infinite; }",
