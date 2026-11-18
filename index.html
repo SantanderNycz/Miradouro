@@ -10,9 +10,9 @@
   <link rel="shortcut icon" href="./Assets/favicon/favicon.ico" type="image/x-icon">
   <style>
     :root {
-      --bg: #F6F7F9; --ink: #1C2530; --primary: #1D5B7E; --primary-hover: #1C2530;
-      --accentL: #8FB0C4; --surface: #FFFFFF; --text: #1C2530; --muted: #5B6673;
-      --border: #E6E8EC; --pos: #3E7C63; --neg: #B4432E;
+      --bg: #F7F5FB; --ink: #241A38; --primary: #5A31C9; --primary-hover: #3A1F7A;
+      --accentL: #B9A7EE; --surface: #FFFFFF; --text: #2B2440; --muted: #8B8698;
+      --border: #ECEAF2; --pos: #2FA66B; --neg: #C0533B;
     }
     * { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; height: 100%; }
@@ -122,17 +122,19 @@
   <!-- Consome { meta, tabs:[{ label, blocks:[...] }] }. Usado na pré-visualização e embutido no index.html exportado. -->
   <script type="text/plain" id="reportSrc">
     const { useState } = React;
-    const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell, ReferenceLine } = Recharts;
+    const { BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell, ReferenceLine } = Recharts;
 
     const THEMES = {
+      P: { name: "Beringela", bg: "#F7F5FB", surface: "#FFFFFF", navy: "#241A38", navyLight: "#5A31C9", gold: "#5A31C9", goldLight: "#B9A7EE", slate: "#9AA3AE", terracotta: "#C0533B", sage: "#2FA66B", text: "#2B2440", muted: "#8B8698", border: "#ECEAF2" },
       A: { name: "Grafite & Aço", bg: "#F6F7F9", surface: "#FFFFFF", navy: "#1C2530", navyLight: "#1D5B7E", gold: "#1D5B7E", goldLight: "#8FB0C4", slate: "#8A94A2", terracotta: "#B4432E", sage: "#3E7C63", text: "#1C2530", muted: "#5B6673", border: "#E6E8EC" },
       B: { name: "Ardósia & Âmbar", bg: "#F7F5F0", surface: "#FFFFFF", navy: "#20242B", navyLight: "#9A6B2A", gold: "#A9762F", goldLight: "#C99A5B", slate: "#8C8A85", terracotta: "#A6462F", sage: "#5E7A57", text: "#20242B", muted: "#6A6A66", border: "#E7E3DA" },
       C: { name: "Petróleo", bg: "#F5F7F7", surface: "#FFFFFF", navy: "#16232B", navyLight: "#1E6E6A", gold: "#1E6E6A", goldLight: "#77ABA8", slate: "#8A9699", terracotta: "#C05640", sage: "#3F7D5E", text: "#16232B", muted: "#5A6A6E", border: "#E3E8E8" },
     };
-    let C = THEMES.A;
+    const SHADOW = "0 1px 2px rgba(20,16,40,.04), 0 16px 36px -18px rgba(20,16,40,.16)";
+    let C = THEMES.P;
     let PAL = { navy: C.navy, navyLight: C.navyLight, sage: C.sage, terracotta: C.terracotta, gold: C.gold, goldLight: C.goldLight, slate: C.slate };
     function applyTheme(name) {
-      C = THEMES[name] || THEMES.A;
+      C = THEMES[name] || THEMES.P;
       PAL = { navy: C.navy, navyLight: C.navyLight, sage: C.sage, terracotta: C.terracotta, gold: C.gold, goldLight: C.goldLight, slate: C.slate };
     }
     const col = (k) => (k == null ? C.navy : (PAL[k] || (String(k).charAt(0) === "#" ? k : C.navy)));
@@ -183,7 +185,7 @@
 
     function Note({ tone, children }) {
       const t = { neutral: { bg: "rgba(23,32,51,.04)", bar: C.navyLight }, warn: { bg: "rgba(217,45,32,.06)", bar: C.terracotta }, good: { bg: "rgba(18,183,106,.08)", bar: C.sage }, gold: { bg: "rgba(79,70,229,.06)", bar: C.gold } }[tone || "neutral"] || { bg: "rgba(23,32,51,.04)", bar: C.navyLight };
-      return <div style={{ marginTop: 16, padding: "14px 17px", background: t.bg, borderLeft: `3px solid ${t.bar}`, borderRadius: 6, fontSize: 12.8, lineHeight: 1.65 }}>{children}</div>;
+      return <div style={{ marginTop: 16, padding: "14px 17px", background: t.bg, borderLeft: `3px solid ${t.bar}`, borderRadius: 12, fontSize: 12.8, lineHeight: 1.65 }}>{children}</div>;
     }
 
     function Seg({ value, onChange, options }) {
@@ -199,24 +201,41 @@
       );
     }
 
+    function Spark({ pts, color }) {
+      if (!pts || pts.length < 2) return null;
+      const w = 120, h = 36, mx = Math.max.apply(null, pts), mn = Math.min.apply(null, pts), rng = (mx - mn) || 1, step = w / (pts.length - 1);
+      const d = pts.map((v, i) => `${(i * step).toFixed(1)},${(h - ((v - mn) / rng) * h).toFixed(1)}`).join(" ");
+      return <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{ position: "absolute", right: 0, bottom: 16, width: "58%", height: 34, opacity: 0.45, zIndex: 1 }}><polyline fill="none" stroke={color} strokeWidth="2" points={d} /></svg>;
+    }
+
     function KpisBlock({ items }) {
       return (
-        <div style={{ display: "flex", gap: 13, flexWrap: "wrap" }}>
-          {(items || []).map((k, i) => (
-            <div key={i} style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 14, padding: "18px 20px", flex: "1 1 210px", minWidth: 190 }}>
-              <div style={{ fontSize: 10.5, letterSpacing: "0.06em", textTransform: "uppercase", color: C.muted, fontWeight: 700, marginBottom: 8 }}>{k.eyebrow}</div>
-              <div style={{ fontFamily: "'Lora', serif", fontSize: 27, color: col(k.accent), lineHeight: 1.1 }}>{k.value}</div>
-              {k.sub && <div style={{ fontSize: 12, color: C.muted, marginTop: 6, lineHeight: 1.45 }}>{k.sub}</div>}
-              {k.footnote && <div style={{ fontSize: 9.5, color: C.gold, marginTop: 6, fontWeight: 600 }}>{k.footnote}</div>}
-            </div>
-          ))}
+        <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+          {(items || []).map((k, i) => {
+            const hero = !!k.hero;
+            const vcol = hero ? "#fff" : col(k.accent || "navyLight");
+            return (
+              <div key={i} style={{ position: "relative", overflow: "hidden", background: hero ? C.navy : C.surface, border: `1px solid ${hero ? C.navy : C.border}`, borderRadius: 18, padding: "18px 20px", flex: "1 1 210px", minWidth: 190, boxShadow: SHADOW }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 10.5, letterSpacing: "0.06em", textTransform: "uppercase", color: hero ? "rgba(255,255,255,.6)" : C.muted, fontWeight: 700, position: "relative", zIndex: 2 }}>
+                  {k.dot && <span style={{ width: 7, height: 7, borderRadius: "50%", background: col(k.dot) }} />}{k.eyebrow}
+                </div>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 10, position: "relative", zIndex: 2 }}>
+                  <span style={{ fontFamily: "'Lora', serif", fontSize: 30, fontWeight: 600, color: vcol, lineHeight: 1 }}>{k.value}</span>
+                  {k.delta && <span style={{ fontSize: 12, fontWeight: 600, color: hero ? "#fff" : (k.deltaDir === "down" ? C.terracotta : C.sage) }}>{k.delta}</span>}
+                </div>
+                {k.sub && <div style={{ fontSize: 12, color: hero ? "rgba(255,255,255,.65)" : C.muted, marginTop: 8, lineHeight: 1.45, position: "relative", zIndex: 2 }}>{k.sub}</div>}
+                {k.footnote && <div style={{ fontSize: 9.5, color: hero ? C.goldLight : C.gold, marginTop: 6, fontWeight: 600, position: "relative", zIndex: 2 }}>{k.footnote}</div>}
+                {k.spark && <Spark pts={k.spark} color={C.goldLight} />}
+              </div>
+            );
+          })}
         </div>
       );
     }
 
     function Synthesis({ title, items }) {
       return (
-        <div style={{ background: C.navy, borderRadius: 16, padding: "26px 30px", color: "#fff" }}>
+        <div style={{ background: C.navy, borderRadius: 20, padding: "28px 32px", color: "#fff", boxShadow: SHADOW }}>
           {title && <div style={{ fontSize: 10.5, letterSpacing: "0.08em", textTransform: "uppercase", color: C.goldLight, fontWeight: 700, marginBottom: 14 }}>{title}</div>}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(270px, 1fr))", gap: 20, fontSize: 13.5, lineHeight: 1.6 }}>
             {(items || []).map((s, i) => <div key={i}><b style={{ color: C.goldLight }}>{s.lead}</b> {s.text}</div>)}
@@ -227,7 +246,7 @@
 
     function Callout({ title, text }) {
       return (
-        <div style={{ background: C.navy, borderRadius: 16, padding: "24px 28px", color: "#fff" }}>
+        <div style={{ background: C.navy, borderRadius: 20, padding: "26px 30px", color: "#fff", boxShadow: SHADOW }}>
           {title && <div style={{ fontSize: 10.5, letterSpacing: "0.08em", textTransform: "uppercase", color: C.goldLight, fontWeight: 700, marginBottom: 10 }}>{title}</div>}
           <div style={{ fontSize: 14, lineHeight: 1.65, maxWidth: 860 }}>{text}</div>
         </div>
@@ -333,7 +352,7 @@
               <XAxis dataKey={active.xKey || "lb"} tick={{ fontSize: 11.5, fill: C.text }} axisLine={{ stroke: C.border }} tickLine={false} />
               <YAxis domain={active.yDomain || [0, "auto"]} tickFormatter={(v) => fmt(v, active.yFormat)} tick={{ fontSize: 11.5, fill: C.muted }} axisLine={false} tickLine={false} width={active.yWidth || 46} />
               <Tooltip contentStyle={{ background: C.navy, border: "none", borderRadius: 8, fontSize: 12 }} labelStyle={{ color: C.goldLight, fontFamily: "'Lora', serif" }} itemStyle={{ color: "#fff" }} formatter={tip} />
-              {active.referenceLine && <ReferenceLine y={active.referenceLine.y} stroke={C.navy} strokeDasharray="5 4" label={active.referenceLine.label ? { value: active.referenceLine.label, position: "right", fontSize: 11, fill: C.navy } : undefined} />}
+              {active.referenceLine && <ReferenceLine y={active.referenceLine.y} stroke={C.navy} strokeDasharray="5 4" label={active.referenceLine.label ? { value: active.referenceLine.label, position: "insideTopRight", fontSize: 11, fill: C.navy, dy: -6 } : undefined} />}
               {active.legend && <Legend wrapperStyle={{ fontSize: 11.5, paddingTop: 10 }} />}
               {series.map((s, si) => {
                 const isLast = si === series.length - 1;
@@ -356,9 +375,37 @@
       );
     }
 
+    function AreaChartBlock({ spec }) {
+      const data = spec.data || [];
+      const s0 = (spec.series && spec.series[0]) || {};
+      const c = col(s0.color || "navyLight");
+      const gid = "grad" + Math.abs((spec.xKey || "x").length * 7 + data.length * 13 + c.length);
+      return (
+        <div>
+          {spec.subtitle && <div style={{ fontSize: 12, fontWeight: 600, color: C.muted, textAlign: "center", marginBottom: 8 }}>{spec.subtitle}</div>}
+          <ResponsiveContainer width="100%" height={spec.height || 280}>
+            <AreaChart data={data} margin={{ top: 16, right: 10, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={c} stopOpacity={0.35} />
+                  <stop offset="100%" stopColor={c} stopOpacity={0.03} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid stroke={C.border} vertical={false} />
+              <XAxis dataKey={spec.xKey || "lb"} tick={{ fontSize: 11, fill: C.muted }} axisLine={{ stroke: C.border }} tickLine={false} />
+              <YAxis domain={spec.yDomain || [0, "auto"]} tickFormatter={(v) => fmt(v, spec.yFormat)} tick={{ fontSize: 11, fill: C.muted }} axisLine={false} tickLine={false} width={spec.yWidth || 48} />
+              <Tooltip contentStyle={{ background: C.navy, border: "none", borderRadius: 8, fontSize: 12 }} labelStyle={{ color: C.goldLight, fontFamily: "'Lora', serif" }} itemStyle={{ color: "#fff" }} formatter={(v, n, p) => [fmt(v, (spec.tooltip && spec.tooltip.valueFormat) || spec.yFormat), (spec.tooltip && spec.tooltip.extraKey && p && p.payload) ? p.payload[spec.tooltip.extraKey] : (s0.name || "")]} />
+              {spec.referenceLine && <ReferenceLine y={spec.referenceLine.y} stroke={C.navy} strokeDasharray="5 4" label={spec.referenceLine.label ? { value: spec.referenceLine.label, position: "insideTopRight", fontSize: 11, fill: C.navy, dy: -6 } : undefined} />}
+              <Area type="monotone" dataKey={s0.key || "v"} stroke={c} strokeWidth={2.5} fill={`url(#${gid})`} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      );
+    }
+
     function CardBlock({ block }) {
       return (
-        <div style={{ background: C.surface, borderRadius: 16, padding: "23px 25px", border: `1px solid ${C.border}` }}>
+        <div style={{ background: C.surface, borderRadius: 20, padding: "24px 26px", border: `1px solid ${C.border}`, boxShadow: SHADOW }}>
           <Title eyebrow={block.eyebrow} title={block.title} subtitle={block.subtitle} />
           <Blocks list={block.blocks} />
         </div>
@@ -382,6 +429,7 @@
         case "card": return <CardBlock block={block} />;
         case "row": return <RowBlock block={block} />;
         case "barChart": return <BarChartBlock spec={block} />;
+        case "areaChart": return <AreaChartBlock spec={block} />;
         case "note": return <Note tone={block.tone}>{rich(block.text)}</Note>;
         case "banner": return <Banner tone={block.tone} text={block.text} />;
         case "synthesis": return <Synthesis title={block.title} items={block.items} />;
@@ -411,33 +459,51 @@
       const [tab, setTab] = useState(0);
       const showTabs = tabs.length > 1;
       const activeTab = tabs[Math.min(tab, tabs.length - 1)] || tabs[0];
+      const brandShort = meta.brand ? meta.brand.split("·")[0].trim() : "Relatório";
+      const frameCss = "@media (max-width: 760px){ .mir-app{flex-direction:column !important;} .mir-side{width:auto !important;} .mir-panel{margin-left:0 !important; border-radius:0 !important;} }";
 
       return (
-        <div style={{ background: C.bg, minHeight: "100%", fontFamily: "Poppins, sans-serif", color: C.text, padding: "28px 24px 44px" }}>
-          <div style={{ maxWidth: 1080, margin: "0 auto" }}>
-            <div style={{ marginBottom: 22 }}>
-              {meta.brand && <div style={{ fontSize: 10.5, letterSpacing: "0.11em", textTransform: "uppercase", color: C.gold, fontWeight: 700, marginBottom: 9 }}>{meta.brand}</div>}
-              {meta.title && <h1 style={{ fontFamily: "'Lora', serif", fontSize: 31, color: C.navy, margin: "0 0 9px", lineHeight: 1.2 }}>{meta.title}</h1>}
-              {meta.intro && <p style={{ color: C.muted, fontSize: 13.5, maxWidth: 720, margin: 0, lineHeight: 1.6 }}>{meta.intro}</p>}
-            </div>
+        <div style={{ minHeight: "100%", fontFamily: "Poppins, sans-serif", color: C.text, padding: "26px 22px", background: `repeating-linear-gradient(135deg, rgba(255,255,255,.02) 0 2px, transparent 2px 26px), ${C.navy}` }}>
+          <style>{frameCss}</style>
+          <div className="mir-app" style={{ maxWidth: 1200, margin: "0 auto", display: "flex", background: C.navy, borderRadius: 28, overflow: "hidden", boxShadow: "0 40px 90px -34px rgba(0,0,0,.55)" }}>
 
-            {showTabs && (
-              <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 24, borderBottom: `1px solid ${C.border}`, paddingBottom: 13 }}>
-                {tabs.map((t, i) => (
-                  <button key={i} onClick={() => setTab(i)}
-                    style={{ border: "none", cursor: "pointer", padding: "8px 16px", borderRadius: 9, fontSize: 12.5, fontWeight: 600, fontFamily: "Poppins, sans-serif", background: i === tab ? C.navy : "transparent", color: i === tab ? "#fff" : C.muted }}>
-                    {t.label}
-                  </button>
-                ))}
+            <aside className="mir-side" style={{ width: 240, flex: "none", padding: "26px 18px", color: "#fff", background: "rgba(255,255,255,.05)" }}>
+              <div style={{ padding: "0 8px 16px", borderBottom: "1px solid rgba(255,255,255,.1)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13.5, fontWeight: 600 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: "50%", background: C.sage }} />{brandShort}
+                </div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,.5)", marginTop: 3 }}>Relatório de campanha</div>
               </div>
-            )}
+              {showTabs && (
+                <nav style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 16 }}>
+                  {tabs.map((t, i) => (
+                    <button key={i} onClick={() => setTab(i)}
+                      style={{ textAlign: "left", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 11, padding: "11px 13px", borderRadius: 11, fontFamily: "Poppins, sans-serif", fontSize: 13, fontWeight: i === tab ? 600 : 500, background: i === tab ? "#fff" : "transparent", color: i === tab ? C.navy : "rgba(255,255,255,.8)", boxShadow: i === tab ? SHADOW : "none" }}>
+                      <span style={{ width: 16, height: 16, borderRadius: 5, flex: "none", background: i === tab ? C.navyLight : "rgba(255,255,255,.18)" }} />{t.label}
+                    </button>
+                  ))}
+                </nav>
+              )}
+              {meta.footer && <div style={{ marginTop: 22, fontSize: 10.5, color: "rgba(255,255,255,.45)", lineHeight: 1.5, padding: "0 8px" }}>{meta.footer}</div>}
+            </aside>
 
-            <Blocks list={activeTab.blocks} spacing={22} />
+            <section className="mir-panel" style={{ flex: 1, minWidth: 0, background: C.surface, borderRadius: "26px 0 0 26px", marginLeft: -18, padding: "26px 30px 34px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 14, flexWrap: "wrap", paddingBottom: 18, borderBottom: `1px solid ${C.border}`, marginBottom: 22 }}>
+                <div>
+                  <div style={{ width: 40, height: 4, borderRadius: 4, background: C.navyLight, marginBottom: 12 }} />
+                  {meta.brand && <div style={{ fontSize: 10.5, letterSpacing: "0.11em", textTransform: "uppercase", color: C.gold, fontWeight: 700, marginBottom: 8 }}>{meta.brand}</div>}
+                  {meta.title && <h1 style={{ fontFamily: "'Lora', serif", fontSize: 32, fontWeight: 600, color: C.navy, margin: "0 0 9px", lineHeight: 1.12, letterSpacing: "-.01em" }}>{meta.title}</h1>}
+                  {meta.intro && <p style={{ color: C.muted, fontSize: 13.5, maxWidth: 680, margin: 0, lineHeight: 1.6 }}>{meta.intro}</p>}
+                </div>
+                {meta.period && <span style={{ flex: "none", background: C.navyLight, color: "#fff", fontSize: 12, fontWeight: 600, padding: "9px 15px", borderRadius: 999, boxShadow: SHADOW }}>{meta.period}</span>}
+              </div>
 
-            {meta.readingNotes && (
-              <div style={{ background: C.surface, borderRadius: 14, padding: "18px 22px", border: `1px solid ${C.border}`, fontSize: 11.8, color: C.muted, lineHeight: 1.65, marginTop: 22 }}>{rich(meta.readingNotes)}</div>
-            )}
-            {meta.footer && <div style={{ marginTop: 16, fontSize: 11.5, color: C.muted, textAlign: "center" }}>{meta.footer}</div>}
+              <Blocks list={activeTab.blocks} spacing={16} />
+
+              {meta.readingNotes && (
+                <div style={{ background: C.bg, borderRadius: 16, padding: "16px 20px", border: `1px solid ${C.border}`, fontSize: 11.8, color: C.muted, lineHeight: 1.65, marginTop: 16 }}>{rich(meta.readingNotes)}</div>
+              )}
+            </section>
           </div>
         </div>
       );
@@ -455,7 +521,8 @@
     // ---------------- MODELO AMIGÁVEL (usado pelos formulários) ----------------
     const DEFAULT_MODEL = {
       meta: {
-        theme: "A",
+        theme: "P",
+        period: "6–31 Ago 2026",
         brand: "Laskasas Portugal · Relatório de campanha",
         title: "Dias Quentes — Agosto 2026",
         intro: "Análise de resultados da campanha de verão. Este ano a campanha de saldos foi feita em maio e junho e voltou a acontecer em agosto, como nos anos anteriores. Maio e junho tiveram condicionantes próprias, que se assinalam adiante. Este relatório analisa a campanha de agosto no seu contexto.",
@@ -463,10 +530,10 @@
         readingNotes: "**Notas de leitura.** Vendas, objetivos e investimento são valores oficiais (ficheiro de vendas). Os dados de clientes novos, recorrentes, ticket médio e faixas de valor vêm do Artsoft, o CRM atual, que tem falhas conhecidas; são aproximados e não coincidem com os valores oficiais. O ticket médio é, por cliente, a soma das suas compras a dividir pelo número de compras. As vendas incluem lojas físicas e online, não sendo atribuíveis a plataformas de anúncios, pelo que os rácios são indicadores de negócio e não de atribuição. As entradas em loja usam o sistema de contagem atual, ativo desde novembro de 2025; períodos anteriores usaram um sistema com erros de contagem conhecidos e não são diretamente comparáveis.",
       },
       kpis: [
-        { eyebrow: "Objetivo atingido", value: "108%", sub: "1,94 M€ vendidos, sobre 1,80 M€ de objetivo", accent: "sage", artsoft: false },
-        { eyebrow: "Saldos de Mai/Jun", value: "74% e 84%", sub: "Ficaram abaixo do objetivo; tiveram condicionantes próprias", accent: "terracotta", artsoft: false },
-        { eyebrow: "Valor por visita ao site", value: "10,66 €", sub: "O mais alto desde que há tráfego comparável (2024+)", accent: "navy", artsoft: false },
-        { eyebrow: "Clientes novos", value: "290", sub: "Forte mês de aquisição, acima de Mai (213) e Jun (147)", accent: "gold", artsoft: true },
+        { eyebrow: "Objetivo atingido", value: "108%", sub: "1,94 M€ vendidos, sobre 1,80 M€ de objetivo", accent: "sage", artsoft: false, hero: true, delta: "+8 p.p.", deltaDir: "up" },
+        { eyebrow: "Saldos de Mai/Jun", value: "74% e 84%", sub: "Ficaram abaixo do objetivo; tiveram condicionantes próprias", accent: "terracotta", dot: "terracotta", artsoft: false, delta: "−21%", deltaDir: "down" },
+        { eyebrow: "Valor por visita ao site", value: "10,66 €", sub: "O mais alto desde que há tráfego comparável (2024+)", accent: "navyLight", dot: "navyLight", artsoft: false, delta: "+22%", deltaDir: "up", spark: [9.29, 8.73, 8.28, 5.71, 10.66] },
+        { eyebrow: "Clientes novos", value: "290", sub: "Forte mês de aquisição, acima de Mai (213) e Jun (147)", accent: "sage", dot: "sage", artsoft: true, spark: [338, 270, 300, 213, 147, 290] },
       ],
       arc2026: [
         { lb: "Mai/26", sub: "Saldos −35%", ating: 74.3, tone: "exp" },
@@ -560,9 +627,9 @@
           {
             label: "Veredicto",
             blocks: [
-              { type: "kpis", items: m.kpis.map((k) => ({ eyebrow: k.eyebrow, value: k.value, sub: k.sub, accent: k.accent, footnote: k.artsoft ? "fonte: Artsoft (aprox.)" : null })) },
-              { type: "card", eyebrow: "Saldos do ano", title: "Cumprimento do objetivo por campanha", subtitle: "Percentagem do objetivo comercial atingida pelas campanhas de desconto profundo. A linha marca os 100%.", blocks: [
-                { type: "barChart", data: arc, xKey: "lb", height: 330, yFormat: "percent", yDomain: [0, 120], referenceLine: { y: 100, label: "objetivo" }, barLabelFormat: "percent", barLabelStyle: { fontSize: 14, fill: "navy", fontWeight: 700 }, series: [{ key: "ating", colorKey: "color" }], tooltip: { valueFormat: "percent", extraKey: "sub" }, legendItems: [{ color: "terracotta", label: "Abaixo do objetivo" }, { color: "sage", label: "Campanha em destaque" }] },
+              { type: "kpis", items: m.kpis.map((k) => ({ eyebrow: k.eyebrow, value: k.value, sub: k.sub, accent: k.accent, hero: k.hero, dot: k.dot, delta: k.delta, deltaDir: k.deltaDir, spark: k.spark, footnote: k.artsoft ? "fonte: Artsoft (aprox.)" : null })) },
+              { type: "card", eyebrow: "Visão geral", title: "Evolução de vendas por campanha", subtitle: "Vendas de cada campanha de verão ao longo do tempo. A linha marca o objetivo de agosto.", blocks: [
+                { type: "areaChart", data: camp, xKey: "lb", height: 300, yFormat: "eurM", series: [{ key: "vnd", name: "Vendas", color: "navyLight" }], referenceLine: { y: 1800000, label: "objetivo Ago" }, tooltip: { valueFormat: "eur", extraKey: "sub" } },
               ] },
               { type: "synthesis", title: "Síntese", items: m.sintese },
             ],
@@ -659,7 +726,9 @@
       "",
       "Estrutura de topo:",
       '{ "meta": { "theme", "brand", "title", "intro", "footer", "readingNotes" }, "tabs": [ { "label": "Nome da aba", "blocks": [ ...blocos ] } ] }',
-      '- meta.theme escolhe a paleta: "A" (Grafite & Aço), "B" (Ardósia & Âmbar) ou "C" (Petróleo). Por defeito "A".',
+      '- meta.theme escolhe a paleta: "P" (Beringela, padrão), "A" (Grafite & Aço), "B" (Ardósia & Âmbar) ou "C" (Petróleo).',
+      '- KPIs (bloco kpis) aceitam, além de eyebrow/value/sub/accent: hero (bool, cartão escuro de destaque), delta (texto, ex. "+8 p.p."), deltaDir ("up"/"down"), dot (cor do ponto) e spark (lista de números para a mini-linha).',
+      '- Gráfico de série temporal: usa o bloco areaChart (mesma config do barChart: data, xKey, series[0], yFormat, referenceLine). Para comparar categorias usa barChart.',
       "- tabs é uma lista. Podes ter 1 aba (a barra de abas fica escondida) ou várias.",
       "- Em qualquer texto, envolve uma expressão em **duplo asterisco** para a pôr a negrito.",
       "- Cores aceitam um nome (navy, navyLight, sage, terracotta, gold, goldLight, slate) ou um hex tipo \"#4F46E5\".",
@@ -839,7 +908,7 @@
       // retematiza a interface do estúdio consoante o tema do relatório
       useEffect(() => {
         const themes = window.__THEMES || {};
-        const T = themes[(preview && preview.meta && preview.meta.theme) || "A"] || themes.A;
+        const T = themes[(preview && preview.meta && preview.meta.theme) || "P"] || themes.P;
         if (!T) return;
         const r = document.documentElement, s = (k, v) => r.style.setProperty(k, v);
         s("--bg", T.bg); s("--ink", T.navy); s("--primary", T.navyLight); s("--primary-hover", T.navy);
@@ -865,7 +934,7 @@
       const onResetJson = () => { if (confirm("Substituir o JSON pelo exemplo por defeito?")) setJsonText(JSON.stringify(modelToReport(DEFAULT_MODEL), null, 2)); };
       const onFormToJson = () => { setJsonText(JSON.stringify(modelToReport(model), null, 2)); setMode("json"); };
 
-      const kpiCols = [{ key: "eyebrow", label: "Rótulo", type: "text" }, { key: "value", label: "Valor", type: "text" }, { key: "sub", label: "Descrição", type: "text" }, { key: "accent", label: "Cor", type: "select", options: ACCENTS }, { key: "artsoft", label: "Artsoft?", type: "checkbox" }];
+      const kpiCols = [{ key: "eyebrow", label: "Rótulo", type: "text" }, { key: "value", label: "Valor", type: "text" }, { key: "sub", label: "Descrição", type: "text" }, { key: "accent", label: "Cor", type: "select", options: ACCENTS }, { key: "delta", label: "Variação", type: "text" }, { key: "deltaDir", label: "Sinal", type: "select", options: [{ value: "up", label: "▲ positivo" }, { value: "down", label: "▼ negativo" }] }, { key: "hero", label: "Herói?", type: "checkbox" }, { key: "artsoft", label: "Artsoft?", type: "checkbox" }];
       const arcCols = [{ key: "lb", label: "Rótulo", type: "text" }, { key: "sub", label: "Subtítulo", type: "text" }, { key: "ating", label: "% objetivo", type: "number", step: "0.1" }, { key: "tone", label: "Cor", type: "select", options: TONES }];
       const sinteseCols = [{ key: "lead", label: "Destaque (negrito)", type: "text" }, { key: "text", label: "Texto", type: "text" }];
       const campCols = [{ key: "lb", label: "Mês", type: "text" }, { key: "camp", label: "Campanha", type: "text" }, { key: "disc", label: "Desconto", type: "text" }, { key: "inv", label: "Investim.", type: "number" }, { key: "obj", label: "Objetivo", type: "number" }, { key: "vnd", label: "Vendas", type: "number" }, { key: "ating", label: "% atingido", type: "number", step: "0.1" }, { key: "exp", label: "Abaixo?", type: "checkbox" }, { key: "hero", label: "Destaque?", type: "checkbox" }];
@@ -877,7 +946,7 @@
       const recCols = [{ key: "faixa", label: "Faixa", type: "text" }, { key: "n", label: "Nº clientes", type: "number" }, { key: "pct", label: "%", type: "number" }];
 
       const blanks = {
-        kpis: { eyebrow: "", value: "", sub: "", accent: "navy", artsoft: false },
+        kpis: { eyebrow: "", value: "", sub: "", accent: "navyLight", delta: "", deltaDir: "up", hero: false, artsoft: false },
         arc2026: { lb: "", sub: "", ating: 0, tone: "exp" },
         sintese: { lead: "", text: "" },
         camp: { lb: "", camp: "", disc: "", inv: 0, obj: 0, vnd: 0, ating: 0, exp: false, hero: false },
@@ -930,7 +999,8 @@
                   <Section eyebrow="Cabeçalho" title="Cabeçalho e introdução" open={true}>
                     <div className="field">
                       <label>Tema (paleta)</label>
-                      <select value={model.meta.theme || "A"} onChange={(e) => setMeta("theme", e.target.value)}>
+                      <select value={model.meta.theme || "P"} onChange={(e) => setMeta("theme", e.target.value)}>
+                        <option value="P">Beringela (padrão)</option>
                         <option value="A">A · Grafite &amp; Aço</option>
                         <option value="B">B · Ardósia &amp; Âmbar</option>
                         <option value="C">C · Petróleo</option>
@@ -938,10 +1008,11 @@
                     </div>
                     <Field label="Marca / linha superior" value={model.meta.brand} onChange={(v) => setMeta("brand", v)} />
                     <Field label="Título" value={model.meta.title} onChange={(v) => setMeta("title", v)} />
+                    <Field label="Período (pill no topo)" value={model.meta.period} onChange={(v) => setMeta("period", v)} />
                     <Field label="Introdução" area={4} value={model.meta.intro} onChange={(v) => setMeta("intro", v)} />
                   </Section>
                   <Section eyebrow="Veredicto" title="Cartões-chave (KPIs)"><TableEditor columns={kpiCols} rows={model.kpis} onChange={(r) => setList("kpis", r)} blank={blanks.kpis} /></Section>
-                  <Section eyebrow="Veredicto" title="Gráfico de cumprimento"><TableEditor columns={arcCols} rows={model.arc2026} onChange={(r) => setList("arc2026", r)} blank={blanks.arc2026} /></Section>
+                  <Section eyebrow="Veredicto" title="Evolução de vendas (área)"><div style={{ fontSize: 11.5, color: "#8B8698", lineHeight: 1.5 }}>O gráfico do Veredicto mostra a evolução de vendas de todas as campanhas (secção "Campanhas de verão", coluna Vendas). Não há aqui nada a editar diretamente.</div></Section>
                   <Section eyebrow="Veredicto" title="Síntese"><TableEditor columns={sinteseCols} rows={model.sintese} onChange={(r) => setList("sintese", r)} blank={blanks.sintese} /></Section>
                   <Section eyebrow="Resultado" title="Campanhas de verão">
                     <TableEditor columns={campCols} rows={model.camp} onChange={(r) => setList("camp", r)} blank={blanks.camp} />
